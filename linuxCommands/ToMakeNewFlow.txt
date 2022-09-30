@@ -32,4 +32,4 @@ git add .  %don't need this line every time.
 git commit -m 'Your message here:'
 git push origin main
 
-git pull https://gitlab.com/boakley/mixingandlyapexp
+git pull https://gitlab.com/boakley/mixingandlyapexp.git
