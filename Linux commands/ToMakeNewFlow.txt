@@ -1,0 +1,29 @@
+To make a new flow:
+
+Go to folder code0:
+Change flavor in case1/input.dat
+rm old files in case1
+../diablo
+will save data in case1
+
+Go to folder Cases:
+mkdir in Cases to save data
+
+Go to case0:
+copy data from case1 to Cases/name using the following command (from inside case0)
+cp -a case1/. ../Cases/name/
+
+Go to folder extract:
+edit res_to_dat.f to find new folder Cases/name
+rm res_to_dat executible 
+make while in extract
+./res_to_dat executible
+data should be in Cases/name
+
+
+If you mess up, you will override your previous files in Cases/OldName   !
+Question: Can I get the data to automatically place in Cases/name instead of copying all from case1?
+
+Use semicolon ; to chain multiple commands
+
+Can we use command line to copy the files?
