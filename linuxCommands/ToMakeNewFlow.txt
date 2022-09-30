@@ -28,7 +28,8 @@ Use semicolon ; to chain multiple commands
 
 Can we use command line to copy the files?
 
-git add .
-git commit -m 'Add README.md file by hakase-labs'
-git push origin master
+git add .  %don't need this line every time.
+git commit -m 'Your message here:'
+git push origin main
 
+git pull https://gitlab.com/boakley/mixingandlyapexp
