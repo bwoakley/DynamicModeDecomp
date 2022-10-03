@@ -1,0 +1,63 @@
+This file describes the parameters used in Diablo and contained in input.dat
+
+NU:
+The viscosity in code units.  If the code has been nondimensionalized, then this constant becomes 1/Re where Re is the Reynolds number using the selected velocity and length scale.
+
+LX,LY,LZ:
+The domain size
+
+N_TIME_STEPS:
+Number of integration time steps.  Each timestep contains three Runge-Kutta substeps.
+
+DELTA_T:
+The size of the timestep
+
+RESET_TIME:
+If true, then the simulation time will start at zero, if false, then the simulation will start using the time contained in the initial velocity field (if CREATE_NEW_FLOW=false)
+
+VARIABLE_DT, CFL, UPDATE_DT:
+If VARIABLE_DT=true then the CFL number will be used to specify the timestep every UPDATE_DT timesteps
+
+NUM_PER_DIR:
+The number of periodic directions. This determines which timestepping algorithm will be used:
+   3=periodic flow, 2=channel flow, 1=duct flow, 0=cavity flow
+
+TIME_AD_METH:
+Allows a choice of timestepping method
+
+LES:
+If true, then solve the LES filtered equations with the addition of a LES model
+
+LES_MODEL_TYPE:
+Specifies the method used for the LES model
+  1=Constant Smagorinsky, 2=Dynamic Smagorinsky, 3=Dynamic mixed model
+
+VERBOSITY:
+How much information to write out, higher=more information
+
+SAVE_FLOW_INT:
+How often (in timesteps) to save the entire 3d velocity field to a file
+
+SAVE_STATS_INT:
+How often to write mean statistics to a file
+
+MOVIE:
+If true, then write out 2d slices through the velocity field every SAVE_STATS_INT timesteps in order to create movie files
+
+CREATE_NEW_FLOW:
+If true, then initialize the velocity field using the CREATE_FLOW subroutines, if false, then initialize the velocity field from a restart file called diablo.saved
+
+IC_TYPE, KICK:
+Specify the type of initial condition used in CREATE_FLOW, and add random forcing of KICK amplitude.
+
+F_TYPE, UBULK0, PX0, OMEGA0, AMP_OMEGA0:
+  F_TYPE=1 force with a constant pressure gradient PX0
+  F_TYPE=0 use a pressure gradient that keeps the bulk velocity constant UBULK0
+  F_TYPE=2 force with an oscillatory pressure gradient, amplidude AMP_OMEGA0, frequency OMEAG0
+
+U_BC_LOWER, U_BC_LOWER_C1, etc.
+Type of boundary condition used for the x-velocity at the lower wall
+  U_BC_LOWER = 0 Apply Dirichlet boundary conditions, set the x-velocity at the boundary to U_BC_LOWER_C1
+  U_BC_LOWER = 1 Apply Neumann boundary conditions, set the wall-normal gradient of the x-velocity equal to U_BC_LOWER_C1
+
+Note, for duct and cavity flow, boundary conditions for the side walls should be added to the input file.
