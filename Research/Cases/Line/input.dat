@@ -10,9 +10,9 @@ C Parameters:         NU,          LX,    LY,    LZ  With Bick/Gyr2, change x,z 
 C Method:     NUM_PER_DIR, CREATE_NEW_FLOW
                   3            .FALSE.        
 C Time March:  N_TIME_STEPS, DELTA_T, RESET_TIME, VARIABLE_DT, CFL, UPDATE_DT
-                 500        0.002     .FALSE.     .FALSE.    0.5      1
+                 1000        0.002     .FALSE.     .FALSE.    0.5      1
 C I/O:         VERBOSITY, SAVE_FLOW_INT, SAVE_STATS_INT,  MOVIE
-                   2           1          100000       .FALSE. 
+                   2           10          100000       .FALSE. 
 C Here include 6*N_TH lines, see below for format
 C         CREATE_FLOW_TH(1)  Create new field or Read from DIABLO_TH.START
                .TRUE.

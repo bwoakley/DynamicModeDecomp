@@ -1,46 +1,27 @@
-To make a new flow:
+%%%%%To make a new flow:
 
-Go to folder code0:
-Change flavor in case1/input.dat
-rm old files in case1
-../diablo
-will save data in case1
+If edited diablo.f, inside code0:
+	rm diablo; rm *.o; make;
+Produce data inside case1:
+	rm diablo.saved*; rm diablo_th01*; rm pos*; rm Thi; ../diablo;
+Copy data to Cases, from inside case1:
+	cd ..; cd ..; cd Cases/; rm Line/*; cd ..; cd code0/; cp -a case1/. ../Cases/Line/
+Extract. If choosing new folder in Cases, edit res_to_dat to find.
+If edited res_to_dat, inside extract:
+	rm res_to_dat; make; ./res_to_dat;
 
-Go to folder Cases:
-mkdir in Cases to save data
+%%%%%If gedit gets stuck on `Failed to register: Timeout was reached'
+Then do:
+killall gedit
 
-Go to case0:
-copy data from case1 to Cases/name using the following command (from inside case0)
-cp -a case1/. ../Cases/name/
-
-Go to folder extract:
-edit res_to_dat.f to find new folder Cases/name
-rm res_to_dat executible 
-make while in extract
-./res_to_dat executible
-data should be in Cases/name
-
-
-If you mess up, you will override your previous files in Cases/OldName   !
-Question: Can I get the data to automatically place in Cases/name instead of copying all from case1?
-
-Use semicolon ; to chain multiple commands
-
-Can we use command line to copy the files?
-
-git add .  %don't need this line every time.
-git commit -m 'Your message here:'
+%%%%%When done on server:
+	
+git add .  %don't need this line every time, only when adding new file.
+git commit -a -m 'Your message here:'
 git push origin main
 
 git pull https://gitlab.com/boakley/mixingandlyapexp.git
-
-
-If gedit gets stuck on `Failed to register: Timeout was reached', then do:
-killall gedit
-
-String of commands to rerun diablo:
-
-String of commands to do new example: from inside case1:
-rm diablo.saved*; rm diablo_th01*; rm pos*; rm Thi; ../diablo;
-Still inside case1:
-cd ..; cd ..; cd Cases/; rm Line/*; cd ..; cd code0/; cp -a case1/. ../Cases/Line/
+	
+	
+	
+	

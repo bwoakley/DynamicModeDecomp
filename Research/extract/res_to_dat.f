@@ -29,8 +29,8 @@
       integer THYES
       real*8 DUMMY_TIME
       TIME_START=100000
-      TIME_END=100500
-      TIME_STEP=1
+      TIME_END=101000
+      TIME_STEP=10
 
 ! **** User Input *****
 ! Number of periodic directions used in the simulation

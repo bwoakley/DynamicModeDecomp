@@ -4,9 +4,9 @@ format long;
 
 
 k=256;      %Grid size
-N = 1100;   %N is largest Th to consider
+N = 1010;   %N is largest Th to consider
 dt = .002;   %time step
-skip = 1;   %how many frames to skip. Plot ever t=skip*dt
+skip = 10;   %how many frames to skip. Plot ever t=skip*dt
             %skip 
             %= sav_flow_int from input.dat 
             %= time_step from res_to_dat.f
@@ -22,7 +22,7 @@ x=linspace(-1,1,k+1);x=x(1:end-1);y=x;
 
 ss='Line';
 
-v = VideoWriter('newfile.avi');
+v = VideoWriter('Sim_skip_10.avi');
 open(v)
 
 
@@ -96,7 +96,7 @@ for i = 1000 : 1 : N
     end
 
 
-    t = 100*dt*skip*(i-1000);
+    t = 1*dt*skip*(i-1000);
 
     for j = 1 : size(data,1)
         for k = 1 : size(data,2)
