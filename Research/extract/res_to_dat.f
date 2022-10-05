@@ -36,8 +36,8 @@
 ! Number of periodic directions used in the simulation
       NUM_PER_DIR=3
 ! This string should contain the size of the buffer array
-      LX=2.*3.14159
-      LZ=2.*3.14159
+      LX=2
+      LZ=2
 
       NXM=NX-1
       NYM=NY-1
@@ -52,7 +52,7 @@
       write(*,*) 'TIME: ',TIME1
       TIME_INDEX=TIME_INDEX+1
 
-      cases='Line'
+      cases='Lint'
 
 ! Name of restart file(s)
          FNAME='../Cases/'//cases//'/diablo.saved.'

@@ -3,7 +3,7 @@ figure;set(gcf,'position',[100 100 800 700])
 format long; 
 
 
-k=256;      %Grid size
+k=512;      %Grid size
 N = 1010;   %N is largest Th to consider
 dt = .002;   %time step
 skip = 10;   %how many frames to skip. Plot ever t=skip*dt
@@ -20,9 +20,9 @@ x=linspace(-1,1,k+1);x=x(1:end-1);y=x;
 %[Y X]=meshgrid(y,x)
 [XX, YY] = meshgrid(x,y);
 
-ss='Line';
+ss='Lint';
 
-v = VideoWriter('Sim_skip_10.avi');
+v = VideoWriter('newfile.avi');
 open(v)
 
 

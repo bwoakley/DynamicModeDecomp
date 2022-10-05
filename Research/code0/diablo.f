@@ -94,7 +94,7 @@ C----*|--.---------.---------.---------.---------.---------.---------.-|-------|
       CALL SAVE_FLOW(.FALSE.)
       ENDIF
 
-
+      
 
 C A flag to determine if we are considering the first time-step
       FIRST_TIME=.TRUE.
@@ -134,6 +134,29 @@ C A flag to determine if we are considering the first time-step
                CALL FFT_XZY_TO_FOURIER(U3,CU3)
             ELSEIF (FLAVOR .EQ. 'Linear') THEN !Linear flow u = -x, v = y with dampening (mult by bump) so that u,v=0 at boundary, -1 ---> 1, -1 ---> 1
                epsilonLinear = .1D0
+               DO J=0,NYM
+               DO K=0,NZM
+               DO I=0,NXM
+               IF (K == 0 .or. I == 0 .or. K == NZM .or. I == NXM) THEN 
+                        U1(I,K,J)=0.D0
+               		U3(I,K,J)=0.D0
+               ELSE 
+                    	U1(I,K,J)=-1.*(GX(I)-1.)*EXP(2.*epsilonLinear)
+     &                  *EXP(-1.*epsilonLinear/(1.-(GX(I)-1.)**2.))
+     &			*EXP(-1.*epsilonLinear/(1.-(GZ(K)-1.)**2.))
+                   	U3(I,K,J)=(GZ(K)-1.)*EXP(2.*epsilonLinear)
+     &			*EXP(-1.*epsilonLinear/(1.-(GX(I)-1.)**2.))
+     &			*EXP(-1.*epsilonLinear/(1.-(GZ(K)-1.)**2.))
+               ENDIF
+               END DO
+               END DO
+               END DO
+!     At every step, turn velocity into Fourier
+               CALL FFT_XZY_TO_FOURIER(U1,CU1)
+               CALL FFT_XZY_TO_FOURIER(U3,CU3)
+	    ELSEIF (FLAVOR .EQ. 'Lineart') THEN !Linear flow with time dependence u = -lambda x, v = lambda y with dampening (mult by bump) so that u,v=0 at boundary, -1 ---> 1, -1 ---> 1
+               epsilonLinear = .05D0
+!               WRITE(*,*) 'grid is', NXM	
                DO J=0,NYM
                DO K=0,NZM
                DO I=0,NXM

@@ -1,11 +1,19 @@
 %%%%%To make a new flow:
 
+When changing cases, there are 3-5 places to update:
+-1) Editing diablo.f
+O) In input.dat when chosing case.
+1) When copying to Case/name, (2 changes, see below).
+2) When extracting, in res_to_dat, (1 change).
+3) When post processing, in Matlab code (1 change).
+	
+
 If edited diablo.f, inside code0:
-	rm diablo; rm *.o; make;
+	rm -f diablo; rm *.o; make;
 Produce data inside case1:
-	rm diablo.saved*; rm diablo_th01*; rm pos*; rm Thi; ../diablo;
+	rm -f diablo.saved*; rm -f diablo_th01*; rm -f pos*; rm -f Thi; ../diablo;
 Copy data to Cases, from inside case1:
-	cd ..; cd ..; cd Cases/; rm Line/*; cd ..; cd code0/; cp -a case1/. ../Cases/Line/
+	cd ..; cd ..; cd Cases/; rm -f Lint/*; cd ..; cd code0/; cp -a case1/. ../Cases/Lint/
 Extract. If choosing new folder in Cases, edit res_to_dat to find.
 If edited res_to_dat, inside extract:
 	rm res_to_dat; make; ./res_to_dat;
@@ -23,5 +31,19 @@ git push origin main
 git pull https://gitlab.com/boakley/mixingandlyapexp.git
 	
 	
-	
-	
+%%%%%Changing grid:
+
+I tried changing grid from 256->512
+I changed grid_def that was in: case1, code0, and extract.
+In code0 README it said to do ./make clean, so I did from within code0:
+make clean
+This responded rm -f *.o fort.* *~ diablo core
+I noticed it removed files ending in ~, that is:
+diablo.f~
+diablo_io.f~
+header~
+periodic.f~
+Then I execute:
+make
+This created file: diablo, but not the other ~ files. hmmm...
+And diablo still doesn't run
