@@ -33,3 +33,14 @@ git commit -m 'Your message here:'
 git push origin main
 
 git pull https://gitlab.com/boakley/mixingandlyapexp.git
+
+
+If gedit gets stuck on `Failed to register: Timeout was reached', then do:
+killall gedit
+
+String of commands to rerun diablo:
+
+String of commands to do new example: from inside case1:
+rm diablo.saved*; rm diablo_th01*; rm pos*; rm Thi; ../diablo;
+Still inside case1:
+cd ..; cd ..; cd Cases/; rm Line/*; cd ..; cd code0/; cp -a case1/. ../Cases/Line/

@@ -29,7 +29,7 @@ x=linspace(0,2,k+1);x=x(1:end-1);y=x;
 
 ss='Line';
 
-for i=1000:1 :1010
+for i=1000:1 :1500
     
     if i<10
     st=strcat('../Cases/',ss,'/bin0000',num2str(i));
