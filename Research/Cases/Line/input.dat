@@ -1,12 +1,12 @@
 C A data file for diablo.  This is a generic, easy method of data
 C input, as long as you don't change the number of comment lines.
 C Note that the grid size is defined in the file grid_def.
-C  FLAVOR  FLAVORS FLAVORI VERSION  Linear,Bick,Gyre,Gyr2,Turb,Beta,NFlo/FKPP,NPZ,chmo,diff,NPZ2,BSTA/HD,PR
+C  FLAVOR  FLAVORS FLAVORI VERSION  Linear,Lineart,Bick,Gyre,Gyr2,Turb,Beta,NFlo/FKPP,NPZ,chmo,diff,NPZ2,BSTA/HD,PR
    'Linear'  'diff'   'PR'    1.0        
 C   USE_MPI      USE_LES   (note, also change these flags in Makefile):
     .TRUE.       .FALSE.               
 C Parameters:         NU,          LX,    LY,    LZ  With Bick/Gyr2, change x,z coord
-                     1D-3          2      1     2
+                     1D-3          1      1     1
 C Method:     NUM_PER_DIR, CREATE_NEW_FLOW
                   3            .FALSE.        
 C Time March:  N_TIME_STEPS, DELTA_T, RESET_TIME, VARIABLE_DT, CFL, UPDATE_DT
