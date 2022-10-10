@@ -3,14 +3,14 @@ figure;set(gcf,'position',[100 100 800 700])
 format long; 
 
 
-k=512;      %Grid size
+k=256;      %Grid size
 N = 1010;   %N is largest Th to consider
 dt = .002;   %time step
 skip = 10;   %how many frames to skip. Plot ever t=skip*dt
             %skip 
             %= sav_flow_int from input.dat 
             %= time_step from res_to_dat.f
-Pe = 10^3;   %Peclet number. I think Nu = 10^(-3) in input.dat is the diff const.
+Pe = 4*10^3;   %Peclet number. I think Nu = 10^(-3) in input.dat is the diff const. Actually, my domain is 2by2, so not non-dim. Off by a factor of 2?
 lambda = 1;   %rate
 sigma = sqrt(2)/(2*pi);   %standard deviation of the initial theta as in periodic.f
 theta = zeros(k,k);     %initialize theta analytic
@@ -102,8 +102,8 @@ for i = 1000 : 1 : N
         for k = 1 : size(data,2)
 
 
-            theta(j,k) = sigma^2*exp(lambda*t-.5*(   2*XX(k,j)^2*t*exp(4*lambda*t)*Pe^(-1)...
-                + 2*YY(k,j)^2*t*Pe^(-1) + (XX(k,j)^2 + YY(k,j)^2)*sigma^2*exp(2*lambda*t)  )...
+            theta(j,k) = sigma^2*exp(lambda*t-.5*(   2*XX(j,k)^2*t*exp(4*lambda*t)*Pe^(-1)...
+                + 2*YY(j,k)^2*t*Pe^(-1) + (XX(j,k)^2 + YY(j,k)^2)*sigma^2*exp(2*lambda*t)  )...
                 /(  ( sigma^2*exp(2*lambda*t)+2*t*Pe^(-1) )*( sigma^2 + 2*t*exp(2*lambda*t)*Pe^(-1) )   ) )...
                 /( ( sigma^2*exp(2*lambda*t)+2*t*Pe^(-1) )^(.5)*( sigma^2 + 2*t*exp(2*lambda*t)*Pe^(-1) )^(.5) );
                
