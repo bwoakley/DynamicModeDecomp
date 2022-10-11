@@ -25,6 +25,7 @@ ss='Line';
 v = VideoWriter('newfile.avi');
 open(v)
 
+ERROR = zeros(1,N-999);
 
 for i = 1000 : 1 : N
      
@@ -63,93 +64,103 @@ for i = 1000 : 1 : N
         %max(max(data))
     end
 
-    %Activate to make movie of sim vs analytic
-    if true
-        %put theta sim in first plot
-        subplot(1,2,1)
-    
-        %min(min(data))
-        %max(max(data))
 
-        pcolor(x,x,data(:,:,1)');shading interp;colorbar;
-        set(gca,'fontsize',18)
-        daspect([1,1,1])
-        caxis([0 1])
-        title('theta simulation')
-        hold on;
-        %C=contourc(x,x,data(:,:,1)',[.5 .5]);
-        
+    %put theta sim in first plot
+    subplot(1,2,1)
+
+    %min(min(data))
+    %max(max(data))
+
+    pcolor(x,x,data(:,:,1)');shading interp;colorbar;
+    set(gca,'fontsize',18)
+    daspect([1,1,1])
+    caxis([0 1])
+    title('theta simulation')
+    hold on;
+    %C=contourc(x,x,data(:,:,1)',[.5 .5]);
     
-         %What does below do?
-        if false
-            ll=size(C,2);
-            li=0;
-            ld=1;
-            while ld<ll
-                li=li+1;
-                L(li)=C(2,ld);
-                xc=C(1,ld+1:ld+L(li));
-                yc=C(2,ld+1:ld+L(li));
-                for ki=1:length(xc)-1
-                    xkc(ki*2-1)=xc(ki);xkc(ki*2)=(xc(ki)+xc(ki+1))/2;
-                    ykc(ki*2-1)=yc(ki);ykc(ki*2)=(yc(ki)+yc(ki+1))/2;
-                end
-                plot(xc,yc,'k');
-                ld=ld+L(li)+1;
+
+     %What does below do?
+    if false
+        ll=size(C,2);
+        li=0;
+        ld=1;
+        while ld<ll
+            li=li+1;
+            L(li)=C(2,ld);
+            xc=C(1,ld+1:ld+L(li));
+            yc=C(2,ld+1:ld+L(li));
+            for ki=1:length(xc)-1
+                xkc(ki*2-1)=xc(ki);xkc(ki*2)=(xc(ki)+xc(ki+1))/2;
+                ykc(ki*2-1)=yc(ki);ykc(ki*2)=(yc(ki)+yc(ki+1))/2;
             end
+            plot(xc,yc,'k');
+            ld=ld+L(li)+1;
         end
-    
-   
-        t = 1*dt*skip*(i-1000);
-    
-        for j = 1 : size(data,1)
-            for k = 1 : size(data,2)
-        
-                A = sigma^2+2*t*Pe^(-1)*exp(2*lambda*t);
-                B = sigma^2*exp(2*lambda*t)+2*t*Pe^(-1);
-    
-                %theta(j,k) = sigma^2*exp(lambda*t-.5*(   2*XX(j,k)^2*t*exp(4*lambda*t)*Pe^(-1)...
-                %    + 2*YY(j,k)^2*t*Pe^(-1) + (XX(j,k)^2 + YY(j,k)^2)*sigma^2*exp(2*lambda*t)  )...
-                %    /(  ( sigma^2*exp(2*lambda*t)+2*t*Pe^(-1) )*( sigma^2 + 2*t*exp(2*lambda*t)*Pe^(-1) )   ) )...
-                %    /( ( sigma^2*exp(2*lambda*t)+2*t*Pe^(-1) )^(.5)*( sigma^2 + 2*t*exp(2*lambda*t)*Pe^(-1) )^(.5) );
-                
-                %Or, more simply:
-                %theta(j,k) = sigma^2*exp(lambda*t-.5*(1/(A*B))*( XX(j,k)^2*exp(2*lambda*t)*A ...
-                %    +YY(j,k)^2*B ) )/(sqrt(A*B)); 
-                
-                %From Van Kampen:
-                AA = exp(-2*lambda*t)*(2*pi*sigma^2 - Pe^(-1)/lambda) + Pe^(-1)/lambda ;
-                DD = exp( 2*lambda*t)*(2*pi*sigma^2 + Pe^(-1)/lambda) - Pe^(-1)/lambda ;
+    end
 
-                theta(j,k) = (2*pi)^(-1)*(AA*DD)^(-1/2)*exp( (-1/2)*( (1/AA)*XX(j,k)^2 + (1/DD)*YY(j,k)^2 ) );
 
-            end
+    t = 1*dt*skip*(i-1000);
+    
+    temp = zeros(kk,kk);
+
+    for j = 1 : size(data,1)
+        for k = 1 : size(data,2)
+    
+            A = sigma^2+2*t*Pe^(-1)*exp(2*lambda*t);
+            B = sigma^2*exp(2*lambda*t)+2*t*Pe^(-1);
+
+            %theta(j,k) = sigma^2*exp(lambda*t-.5*(   2*XX(j,k)^2*t*exp(4*lambda*t)*Pe^(-1)...
+            %    + 2*YY(j,k)^2*t*Pe^(-1) + (XX(j,k)^2 + YY(j,k)^2)*sigma^2*exp(2*lambda*t)  )...
+            %    /(  ( sigma^2*exp(2*lambda*t)+2*t*Pe^(-1) )*( sigma^2 + 2*t*exp(2*lambda*t)*Pe^(-1) )   ) )...
+            %    /( ( sigma^2*exp(2*lambda*t)+2*t*Pe^(-1) )^(.5)*( sigma^2 + 2*t*exp(2*lambda*t)*Pe^(-1) )^(.5) );
+            
+            %Or, more simply:
+            %theta(j,k) = sigma^2*exp(lambda*t-.5*(1/(A*B))*( XX(j,k)^2*exp(2*lambda*t)*A ...
+            %    +YY(j,k)^2*B ) )/(sqrt(A*B)); 
+            
+            %From Van Kampen:
+            AA = exp(-2*lambda*t)*(sigma^2 - Pe^(-1)/lambda) + Pe^(-1)/lambda ;
+            DD = exp( 2*lambda*t)*(sigma^2 + Pe^(-1)/lambda) - Pe^(-1)/lambda ;
+
+            theta(j,k) = exp( (-1/2)*( (1/AA)*XX(j,k)^2 + (1/DD)*YY(j,k)^2 ) );
+            
+
+            temp(j,k) = data(j,k) - theta(j,k); %This matrix temp checks the difference (error) b/w simulation and analytic solution.
+
         end
+    end
+
+    %min(min(theta))
+    %max(max(theta))
     
-        %min(min(theta))
-        %max(max(theta))
+    
+
+    subplot(1,2,2)
+    pcolor(x,x,theta);shading interp;colorbar;
+
+    set(gca,'fontsize',18)
+    daspect([1,1,1])
+    caxis([0 1])
+    title('theta analytic')
+
+    %drawnow
+    %Instead of drawnow, save the movie in F
+
+    frame = getframe(gcf);
+    writeVideo(v,frame);
 
 
-        subplot(1,2,2)
-        pcolor(x,x,theta);shading interp;colorbar;
+    %writeVideo(v,data(:,:,1)')
+    %writeVideo(v,C)
     
-        set(gca,'fontsize',18)
-        daspect([1,1,1])
-        caxis([0 1])
-        title('theta analytic')
+    hold off;
     
-        %drawnow
-        %Instead of drawnow, save the movie in F
+
     
-        frame = getframe(gcf);
-        writeVideo(v,frame);
-    
-    
-        %writeVideo(v,data(:,:,1)')
-        %writeVideo(v,C)
-        
-        hold off;
-    end %This ends the if true/false to make movie
+    ERROR(i-999) = max(max(temp)) ;
+
+
 
 end
 
@@ -226,9 +237,15 @@ if false
 end %End of if true/false
 
 
+figure;
+tt = zeros(1,N-999);
 
-%Hi
+for i = 1000 : 1 : N
+    tt(i-999) = 1*dt*skip*(i-1000);
+end
 
+
+plot(tt,ERROR)
 
 
 
