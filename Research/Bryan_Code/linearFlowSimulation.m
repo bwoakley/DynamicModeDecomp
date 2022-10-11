@@ -68,6 +68,9 @@ for i = 1000 : 1 : N
         %put theta sim in first plot
         subplot(1,2,1)
     
+        %min(min(data))
+        %max(max(data))
+
         pcolor(x,x,data(:,:,1)');shading interp;colorbar;
         set(gca,'fontsize',18)
         daspect([1,1,1])
@@ -114,12 +117,12 @@ for i = 1000 : 1 : N
                 %theta(j,k) = sigma^2*exp(lambda*t-.5*(1/(A*B))*( XX(j,k)^2*exp(2*lambda*t)*A ...
                 %    +YY(j,k)^2*B ) )/(sqrt(A*B)); 
                 
-                %Somehow, I'm getting:
-                theta(j,k) = sigma^2*exp(lambda*t-.5*(1/(A*B))*( XX(j,k)^2*exp(2*lambda*t)*A ...
-                    +XX(j,k)*exp(2*lambda*t)*A -t*Pe^(-1)*(1/(2*sigma^2))*A ...
-                    +YY(j,k)^2*B + YY(j,k)*B -t*Pe^(-1)*(1/(2*sigma^2))*exp(2*lambda*t)*B ) )/(sqrt(A*B)); 
+                %From Van Kampen:
+                AA = exp(-2*lambda*t)*(2*pi*sigma^2 - Pe^(-1)/lambda) + Pe^(-1)/lambda ;
+                DD = exp( 2*lambda*t)*(2*pi*sigma^2 + Pe^(-1)/lambda) - Pe^(-1)/lambda ;
 
-                
+                theta(j,k) = (2*pi)^(-1)*(AA*DD)^(-1/2)*exp( (-1/2)*( (1/AA)*XX(j,k)^2 + (1/DD)*YY(j,k)^2 ) );
+
             end
         end
     
