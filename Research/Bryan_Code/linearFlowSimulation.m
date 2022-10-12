@@ -12,7 +12,8 @@ skip = 10;   %how many frames to skip. Plot ever t=skip*dt
             %= time_step from res_to_dat.f
 Pe = 10^3;   %Peclet number. I think Nu = 10^(-3) in input.dat is the diff const.
 lambda = 1;   %rate
-sigma = sqrt(1/(8*pi^2));   %standard deviation of the initial theta as in periodic.f
+%sigma = sqrt(1/(8*pi^2));   %standard deviation of the initial theta as in periodic.f
+sigma = .05;
 theta = zeros(kk,kk);     %initialize theta analytic
 
 

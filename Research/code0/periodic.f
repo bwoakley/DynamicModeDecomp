@@ -1192,6 +1192,7 @@ C----*|--.---------.---------.---------.---------.---------.---------.-|-------|
 
       INTEGER si,sj,sk,indG
       real*8 GXs(0:NXM), GYs(0:NYM), GZs(0:NZM),rr
+      real*8 sigmaPR
 
 C Note, Since stratification is not permitted in the periodic flow field
 C Any background stratification must be added to the governing equations
@@ -1265,7 +1266,8 @@ C Any background stratification must be added to the governing equations
                   rr=((GX(I)-GX(si))**2.+(GZ(K)-GZ(sk))**2.)**.5
                ENDIF
                IF ((FLAVORS.eq.'diff').or.(FLAVORS.eq.'FKPP'))THEN
-                  TH(I,K,J,N)=EXP(-rr**2.d0*(2*PI)**2.d0) !Gaussian, 1 scalar
+                  sigmaPR = .05
+                  TH(I,K,J,N)=EXP(-rr**2.d0/(2*(sigmaPR)**2.d0)) !Gaussian, 1 scalar
                ENDIF
                IF (FLAVORS.eq.'chmo')THEN
                   IF (N.eq.1) THEN
