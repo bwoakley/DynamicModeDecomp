@@ -13,7 +13,7 @@ Period=1
 %Case 
 CaseSTART=200-.2; %Start at t=0, find LCS at different base times
 CaseEND=200-.2;   %End at t=1 period.
-dir=-1; %%Direction of integration, +1 F, -1 B
+dir=1; %%Direction of integration, +1 F, -1 B
 
 BASESTEP=0.2*Period; %basetime interval
 INTTIME=2*Period; %integration time
@@ -69,7 +69,7 @@ for ti=1:N_Basetime
             index1 = index1n;
             index2 = index1 + 1;
             %run this check to save loading time
-            checkload;
+            %checkload;
         end     
         uinterp = u1 + (t0 - (index1-1)*ft)*(u2-u1)/ft;
         vinterp = v1 + (t0 - (index1-1)*ft)*(v2-v1)/ft;
@@ -85,7 +85,7 @@ for ti=1:N_Basetime
         if index1n~=index1
             index1 = index1n;
             index2 = index1 + 1;
-            checkload;
+            %checkload;
         end 
         uinterp = u1 + (t1 - (index1-1)*ft)*(u2-u1)/ft;
         vinterp = v1 + (t1 - (index1-1)*ft)*(v2-v1)/ft;
@@ -107,7 +107,7 @@ for ti=1:N_Basetime
         if index1n~=index1
             index1 = index1n;
             index2 = index1 + 1;
-            checkload;
+            %checkload;
         end 
         
         uinterp = u1 + (t3 - (index1-1)*ft)*(u2-u1)/ft;
