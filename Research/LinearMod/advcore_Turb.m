@@ -64,6 +64,7 @@ for ti=1:N_Basetime
         loaded = [-1000 -1000];
         index1=-10000;
         index1n = floor(t0/ft) + 1;
+
         if index1n~=index1
             index1 = index1n;
             index2 = index1 + 1;

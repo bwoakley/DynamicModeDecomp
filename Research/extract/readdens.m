@@ -29,7 +29,7 @@ x=linspace(0,2,k+1);x=x(1:end-1);y=x;
 
 ss='Line';
 
-for i=1000:1 :1050
+for i=1000:1 :1010
     
     if i<10
     st=strcat('../Cases/',ss,'/bin0000',num2str(i));
@@ -46,12 +46,14 @@ fid=fopen(st,'rb');
 data=fread(fid,[1 1],'*float');
 data=fread(fid,[1 inf],'*double');
 fclose(fid);
+
 data=reshape(data,k,k,3);
-om=data(:,:,3);
-ooo(i+1)=sum(om(:).^2);
+
+%om=data(:,:,3);
+%ooo(i+1)=sum(om(:).^2);
 
 subplot(2,2,1)
-pcolor(data(:,:,3)');shading interp;
+pcolor(data(:,:,1)');shading interp;
 daspect([1,1,1]);axis tight
 set(gca,'fontsize',18)
 title('\omega')
@@ -75,7 +77,7 @@ data=fread(fid,[1 1],'*float');
 data=fread(fid,[1 inf],'*double');
 fclose(fid);
 data=reshape(data,k,k,1);
-% subplot(2,2,2)
+subplot(2,2,2)
 pcolor(x,x,data(:,:,1)');shading interp;colorbar
 set(gca,'fontsize',18)
 daspect([1,1,1])

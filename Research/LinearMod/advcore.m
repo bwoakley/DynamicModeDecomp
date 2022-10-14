@@ -71,7 +71,8 @@ for ti=1:N_Basetime
         yt(:,:,timeunit+1)=ynow;
         
 %         if mod(timeunit,INTTIME/Period*20)==0
-        xa=xnow;ya=ynow; 
+        %xa=xnow;ya=ynow;
+        xa = x; ya = y;
         dle_2d;
 %         end
     end
