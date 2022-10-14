@@ -52,7 +52,7 @@
       write(*,*) 'TIME: ',TIME1
       TIME_INDEX=TIME_INDEX+1
 
-      cases='Lint'
+      cases='Line'
 
 ! Name of restart file(s)
          FNAME='../Cases/'//cases//'/diablo.saved.'
@@ -111,28 +111,28 @@
      *            (((COm(I,K,J),I=0,NKX),K=0,TNKZ),J=0,TNKY),
      *            (((CU3(I,K,J),I=0,NKX),K=0,TNKZ),J=0,TNKY)
 ! TEMPORARY: ZERO MEAN MODES:
-         write(*,*) 'Zeroing mean flow...'
-         CU1(0,0,0)=0.d0
-         COm(0,0,0)=0.d0
-         CU3(0,0,0)=0.d0
+!         write(*,*) 'Zeroing mean flow...'
+!         CU1(0,0,0)=0.d0
+!         COm(0,0,0)=0.d0
+!         CU3(0,0,0)=0.d0
 
-        DO J=0,TNKY
-        DO K=0,TNKZ
-        DO I=0,NKX
-           CPsi(I,K,J)=-COm(I,K,J)/(KX2(I)+KY2(J)+KZ2(K))
-        END DO
-        END DO
-        END DO
-        CPsi(0,0,0)=0.d0
+!        DO J=0,TNKY
+!        DO K=0,TNKZ
+!        DO I=0,NKX
+!           CPsi(I,K,J)=-COm(I,K,J)/(KX2(I)+KY2(J)+KZ2(K))
+!        END DO
+!        END DO
+!        END DO
+!        CPsi(0,0,0)=0.d0
 
-         DO J=0,TNKY
-         DO K=0,TNKZ
-         DO I=0,NKX
-            CU1(I,K,J)=-CIKZ(K)*CPsi(I,K,J)
-            CU3(I,K,J)=CIKX(I)*CPsi(I,K,J)
-         END DO
-         END DO
-         END DO 
+!         DO J=0,TNKY
+!         DO K=0,TNKZ
+!         DO I=0,NKX
+!            CU1(I,K,J)=-CIKZ(K)*CPsi(I,K,J)
+!            CU3(I,K,J)=CIKX(I)*CPsi(I,K,J)
+!         END DO
+!         END DO
+!         END DO 
 
 
 
