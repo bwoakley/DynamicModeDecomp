@@ -29,7 +29,7 @@
       integer THYES
       real*8 DUMMY_TIME
       TIME_START=100000
-      TIME_END=101000
+      TIME_END=100500
       TIME_STEP=10
 
 ! **** User Input *****
@@ -52,7 +52,7 @@
       write(*,*) 'TIME: ',TIME1
       TIME_INDEX=TIME_INDEX+1
 
-      cases='Line'
+      cases='Lint'
 
 ! Name of restart file(s)
          FNAME='../Cases/'//cases//'/diablo.saved.'

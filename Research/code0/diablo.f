@@ -61,7 +61,7 @@ C----*|--.---------.---------.---------.---------.---------.---------.-|-------|
       INTEGER N
       real*8 T1,T2,GT !Double Gyre variables
       real*8 beta, Delta, c1, c2, k1, k2, e1, e2, OmB !Bickley variables
-      real*8 epsilonLinear !Linear variables
+      real*8 epsilonLinear, deltaLinear, TT !Linear variables
       real*8 rrr,RNUM1,RNUM2
       complex compi,rrth,cphase
       real*8 ugyre, utide, uvert, epsi, o1, al, c2b, o2, zhy !Gyre2 variables
@@ -154,9 +154,11 @@ C A flag to determine if we are considering the first time-step
 !     At every step, turn velocity into Fourier
                CALL FFT_XZY_TO_FOURIER(U1,CU1)
                CALL FFT_XZY_TO_FOURIER(U3,CU3)
-	    ELSEIF (FLAVOR .EQ. 'Lineart') THEN !Linear flow with time dependence u = -lambda x, v = lambda y with dampening (mult by bump) so that u,v=0 at boundary, -1 ---> 1, -1 ---> 1
-               epsilonLinear = .05D0
-!               WRITE(*,*) 'grid is', NXM	
+	    ELSEIF (FLAVOR .EQ. 'Lineart') THEN !Linear flow with time dependence lambda=(1+delta*t) -.5 ---> .5, -.5 ---> .5
+               epsilonLinear = .01D0
+               deltaLinear = .1D0
+               TT = T2-200. 			!Current time is T2-200
+!              WRITE(*,*) 'time is', TT	
                DO J=0,NYM
                DO K=0,NZM
                DO I=0,NXM
@@ -164,13 +166,15 @@ C A flag to determine if we are considering the first time-step
                         U1(I,K,J)=0.D0
                		U3(I,K,J)=0.D0
                ELSE 
-                    	U1(I,K,J)=-1.*(GX(I)-1.)*EXP(2.*epsilonLinear)
-     &                  *EXP(-1.*epsilonLinear/(1.-(GX(I)-1.)**2.))
-     &			*EXP(-1.*epsilonLinear/(1.-(GZ(K)-1.)**2.))
-                   	U3(I,K,J)=(GZ(K)-1.)*EXP(2.*epsilonLinear)
-     &			*EXP(-1.*epsilonLinear/(1.-(GX(I)-1.)**2.))
-     &			*EXP(-1.*epsilonLinear/(1.-(GZ(K)-1.)**2.))
-               ENDIF
+                    	U1(I,K,J)=-1.*(1. + deltaLinear*TT)
+     &               	*(GX(I)-.5D0)*EXP(8.*epsilonLinear)
+     &                  *EXP(-1.*epsilonLinear/(.25D0-(GX(I)-.5D0)**2.))
+     &			*EXP(-1.*epsilonLinear/(.25D0-(GZ(K)-.5D0)**2.))
+                   	U3(I,K,J)=(1. + deltaLinear*TT)
+     &              	*(GZ(K)-.5D0)*EXP(8.*epsilonLinear)
+     &                  *EXP(-1.*epsilonLinear/(.25D0-(GX(I)-.5D0)**2.))
+     &			*EXP(-1.*epsilonLinear/(.25D0-(GZ(K)-.5D0)**2.))
+     	       END IF
                END DO
                END DO
                END DO

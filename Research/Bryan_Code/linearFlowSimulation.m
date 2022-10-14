@@ -4,13 +4,14 @@ format long;
 
 
 kk=256;      %Grid size
-N = 1050;   %N is largest Th to consider
+N = 1100;   %N is largest Th to consider
 dt = .002;   %time step
 skip = 10;   %how many frames to skip. Plot ever t=skip*dt
             %skip 
             %= sav_flow_int from input.dat 
             %= time_step from res_to_dat.f
 Pe = 10^3;   %Peclet number. I think Nu = 10^(-3) in input.dat is the diff const.
+%Pe = 10^2;
 lambda = 1;   %rate
 %sigma = sqrt(1/(8*pi^2));   %standard deviation of the initial theta as in periodic.f
 sigma = .05;
@@ -23,7 +24,7 @@ x=linspace(-.5,.5,kk+1);x=x(1:end-1);y=x;
 
 ss='Line';
 
-v = VideoWriter('newfile.avi');
+v = VideoWriter('SimVsAnaly.avi');
 open(v)
 
 ERROR = zeros(1,N-999);
@@ -73,6 +74,13 @@ for i = 1000 : 1 : N
     %max(max(data))
 
     pcolor(x,x,data(:,:,1)');shading interp;colorbar;
+    xticks([-.5 0 x(kk)])
+    yticks([-.5 0 y(kk)])
+    xticklabels({'-.5','0','.5'})
+    yticklabels({'-.5','0','.5'})
+
+    
+
     set(gca,'fontsize',18)
     daspect([1,1,1])
     caxis([0 1])
@@ -104,6 +112,7 @@ for i = 1000 : 1 : N
     t = 1*dt*skip*(i-1000);
     
     temp = zeros(kk,kk);
+    VAR = 0;
 
     for j = 1 : size(data,1)
         for k = 1 : size(data,2)
@@ -124,17 +133,19 @@ for i = 1000 : 1 : N
             AA = exp(-2*lambda*t)*(sigma^2 - Pe^(-1)/lambda) + Pe^(-1)/lambda ;
             DD = exp( 2*lambda*t)*(sigma^2 + Pe^(-1)/lambda) - Pe^(-1)/lambda ;
 
-            theta(j,k) = exp( (-1/2)*( (1/AA)*XX(j,k)^2 + (1/DD)*YY(j,k)^2 ) );
+            theta(j,k) = sigma^2*sqrt(1/(AA*DD))*exp( (-1/2)*( (1/AA)*XX(j,k)^2 + (1/DD)*YY(j,k)^2 ) );
             
 
-            temp(j,k) = data(j,k) - theta(j,k); %This matrix temp checks the difference (error) b/w simulation and analytic solution.
-
+            temp(j,k) = abs(data(j,k) - theta(j,k)); %This matrix temp checks the difference (error) b/w simulation and analytic solution.
+            VAR = VAR + abs(theta(j,k))^2;
         end
     end
 
     %min(min(theta))
     %max(max(theta))
     
+    %Check: plot variance to verify analytic solution
+    %VAR
     
 
     subplot(1,2,2)
@@ -144,6 +155,10 @@ for i = 1000 : 1 : N
     daspect([1,1,1])
     caxis([0 1])
     title('theta analytic')
+    xticks([-.5 0 x(kk)])
+    yticks([-.5 0 y(kk)])
+    xticklabels({'-.5','0','.5'})
+    yticklabels({'-.5','0','.5'})
 
     %drawnow
     %Instead of drawnow, save the movie in F
@@ -239,6 +254,7 @@ end %End of if true/false
 
 
 figure;
+
 tt = zeros(1,N-999);
 
 for i = 1000 : 1 : N
@@ -247,9 +263,9 @@ end
 
 
 plot(tt,ERROR)
+title('error(t) = $\sum |\theta_{sim} - \theta_{analy}|$ ','interpreter','latex')
+xlabel('t')
+ylabel('error')
 
-
-
-
-
+saveas(gcf,'errorPlot.pdf')
 

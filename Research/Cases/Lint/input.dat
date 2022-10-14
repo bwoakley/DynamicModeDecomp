@@ -6,11 +6,11 @@ C  FLAVOR  FLAVORS FLAVORI VERSION  Linear,Lineart,Bick,Gyre,Gyr2,Turb,Beta,NFlo
 C   USE_MPI      USE_LES   (note, also change these flags in Makefile):
     .TRUE.       .FALSE.               
 C Parameters:         NU,          LX,    LY,    LZ  With Bick/Gyr2, change x,z coord
-                     1D-3          2      1     2
+                     1D-3          1      1     1
 C Method:     NUM_PER_DIR, CREATE_NEW_FLOW
                   3            .FALSE.        
 C Time March:  N_TIME_STEPS, DELTA_T, RESET_TIME, VARIABLE_DT, CFL, UPDATE_DT
-                 1000        0.002     .FALSE.     .FALSE.    0.5      1
+                 500        0.002     .FALSE.     .FALSE.    0.5      1
 C I/O:         VERBOSITY, SAVE_FLOW_INT, SAVE_STATS_INT,  MOVIE
                    2           10          100000       .FALSE. 
 C Here include 6*N_TH lines, see below for format
