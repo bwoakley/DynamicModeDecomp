@@ -53,7 +53,7 @@ data=reshape(data,k,k,3);
 %ooo(i+1)=sum(om(:).^2);
 
 subplot(2,2,1)
-pcolor(data(:,:,1)');shading interp;
+pcolor(data(:,:,3)');shading interp;
 daspect([1,1,1]);axis tight
 set(gca,'fontsize',18)
 title('\omega')
