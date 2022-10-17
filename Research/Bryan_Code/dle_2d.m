@@ -11,7 +11,6 @@ CG12 = G11.*G12 + G21.*G22 ;
 CG21 = G12.*G11 + G22.*G21 ;
 CG22 = G12.*G12 + G22.*G22 ;
 
-
 Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
@@ -27,4 +26,5 @@ pcolor(XSS,YSS,dle);shading interp; daspect([1 1 1]);
 
 FTLE(:,:,ti)=dle;
 % eval(ssss);
+
 
