@@ -52,7 +52,7 @@
       write(*,*) 'TIME: ',TIME1
       TIME_INDEX=TIME_INDEX+1
 
-      cases='Line'
+      cases='Turb'
 
 ! Name of restart file(s)
          FNAME='../Cases/'//cases//'/diablo.saved.'
