@@ -141,14 +141,14 @@ C A flag to determine if we are considering the first time-step
                         U1(I,K,J)=0.D0
                		U3(I,K,J)=0.D0
                ELSE 
-            U1(I,K,J)=-1.*(GX(I)-LX/2)
-     &           *EXP(epsilonLinear*((2/LX)**2. + (2/LZ)**2.))
-     &           *EXP(-1.*epsilonLinear/( (LX/2)**2.-(GX(I)-LX/2)**2.))
-     &		 *EXP(-1.*epsilonLinear/( (LZ/2)**2.-(GZ(I)-LZ/2)**2.))
-            U3(I,K,J)=(GZ(I)-LZ/2)
-     &           *EXP(epsilonLinear*((2/LX)**2. + (2/LZ)**2.))
-     &           *EXP(-1.*epsilonLinear/( (LX/2)**2.-(GX(I)-LX/2)**2.))
-     &		 *EXP(-1.*epsilonLinear/( (LZ/2)**2.-(GZ(I)-LZ/2)**2.))
+            U1(I,K,J)=-1.*(GX(I)-LX/2.)
+     &       *EXP(epsilonLinear*((2./LX)**2. + (2./LZ)**2.))
+     &       *EXP(-1.*epsilonLinear/( (LX/2.)**2.-(GX(I)-LX/2.)**2.))
+     &	     *EXP(-1.*epsilonLinear/( (LZ/2.)**2.-(GZ(K)-LZ/2.)**2.))
+            U3(I,K,J)=(GZ(K)-LZ/2.)
+     &       *EXP(epsilonLinear*((2./LX)**2. + (2./LZ)**2.))
+     &       *EXP(-1.*epsilonLinear/( (LX/2.)**2.-(GX(I)-LX/2.)**2.))
+     &	     *EXP(-1.*epsilonLinear/( (LZ/2.)**2.-(GZ(K)-LZ/2.)**2.))
                ENDIF
                END DO
                END DO

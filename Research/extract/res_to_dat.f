@@ -29,15 +29,15 @@
       integer THYES
       real*8 DUMMY_TIME
       TIME_START=100000
-      TIME_END=100500
+      TIME_END=101000
       TIME_STEP=10
 
 ! **** User Input *****
 ! Number of periodic directions used in the simulation
       NUM_PER_DIR=3
 ! This string should contain the size of the buffer array
-      LX=1
-      LZ=1
+      LX=3
+      LZ=3
 
       NXM=NX-1
       NYM=NY-1
@@ -52,7 +52,7 @@
       write(*,*) 'TIME: ',TIME1
       TIME_INDEX=TIME_INDEX+1
 
-      cases='Turb'
+      cases='Lin3'
 
 ! Name of restart file(s)
          FNAME='../Cases/'//cases//'/diablo.saved.'
