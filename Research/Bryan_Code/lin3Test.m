@@ -72,7 +72,6 @@ for i = 1000 : 1 : N
 
     %min(min(data))
     %max(max(data))
-
     pcolor(x,x,data(:,:,1)');shading interp;colorbar;
     xticks([-.5 0 x(kk)])
     yticks([-.5 0 y(kk)])

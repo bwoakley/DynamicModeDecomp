@@ -1,4 +1,5 @@
-clear all;close all;
+clear all;
+close all;
 clc;
 format long;
 
@@ -20,11 +21,13 @@ CaseSTART=200-.2; %Start at t=0, find LCS at different base times
 CaseEND=200-.2;   %End at t=1 period.
 dir=1; %%Direction of integration, +1 F, -1 B
 
-BASESTEP=0.2*Period; %basetime interval
-%INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce to t = 1:
-INTTIME=1*Period;
 timestepsize=.02; 
 deltat = dir*timestepsize; %%integration step size with direction
+
+BASESTEP=0.2*Period; %basetime interval
+%INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
+INTTIME=1*abs(deltat);
+%INTTIME=1*Period;
 
 %Discretization
 x=linspace(0,L,256*3+1); 
@@ -70,13 +73,15 @@ for ti=1:N_Basetime
         i
         current_time = start_time + (i-1)*deltat;   
         x0 = xnow;
+        %min(min(x0))
+        %max(max(x0))
         y0 = ynow;
         t0 = current_time;
 
         %data file name
         ss='Lin3';
 
-        ii = i + 999;
+        ii = i + 1000;
         st=strcat('../Cases/',ss,'/bin0',num2str(ii));
         fid=fopen(st,'rb');
         data=fread(fid,[1 1],'*float');
@@ -85,6 +90,8 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u1 = data(:,:,1)' ;
         v1 = data(:,:,2)' ;
+        
+        
 
         ii2 = ii + 1;
         st=strcat('../Cases/',ss,'/bin0',num2str(ii2));
@@ -95,6 +102,7 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u2 = data(:,:,1)' ;
         v2 = data(:,:,2)' ;
+
 
         loaded = [-1000 -1000];
         index1=-10000;
@@ -109,6 +117,9 @@ for ti=1:N_Basetime
         uinterp = u1 + (t0 - (index1-1)*ft)*(u2-u1)/ft;
         vinterp = v1 + (t0 - (index1-1)*ft)*(v2-v1)/ft;
 
+        
+        
+
         xm=mod(x0,L);ym=mod(y0,L);
         %urhs1 = interp2(xx,xx,uinterp,ym,xm,inter,0);
         %vrhs1 = interp2(xx,xx,vinterp,ym,xm,inter,0);          
@@ -116,9 +127,15 @@ for ti=1:N_Basetime
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
         urhs1 = interp2(xxcoarse,xxcoarse,uinterp,ym,xm,inter,0);
         vrhs1 = interp2(xxcoarse,xxcoarse,vinterp,ym,xm,inter,0);
+
+        figure;
+        pcolor(urhs1);shading interp;colorbar;
+        title('velocity')
 %*******************************************************************
         x1 = x0 + urhs1*deltat/2;
         y1 = y0 + vrhs1*deltat/2;
+        %min(min(x1)) %Yes, x1 does leave the set [1,2]^2 a bit. So, we should mod it back.
+        %max(max(x1))
         t1 = t0 + deltat/2;
         index1n = floor(t1/ft) + 1;
         if index1n~=index1
