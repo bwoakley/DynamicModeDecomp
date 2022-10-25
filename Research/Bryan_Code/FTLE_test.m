@@ -72,11 +72,22 @@ for ti=1:N_Basetime
         fclose(fid);
         data=reshape(data,kk,kk,3);
         u1 = data(:,:,1)' ;
+        uu1=(-XST+1.5)*3;
         v1 = data(:,:,2)' ;
-        
+        vv1=(YST-1.5)*3;
+
         %figure;
-        %pcolor(YST,XST,v1);shading interp;colorbar;
-        %title('velocity')
+        %subplot(1,3,1)
+        %pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        
+%         subplot(1,3,2)
+%         pcolor(uu1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         subplot(1,3,3)
+%         pcolor(u1-uu1); shading interp; daspect([1, 1, 1]); colorbar;
+
+
 
         ii2 = ii + 1;
         st=strcat('../Cases/',ss,'/bin0',num2str(ii2));
@@ -87,7 +98,20 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u2 = data(:,:,1)' ;
         v2 = data(:,:,2)' ;
+        uu2=(-XST+1.5)*3;
+        vv2=(YST-1.5)*3;
 
+
+         figure;
+        subplot(1,3,1)
+        pcolor(v1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        
+        subplot(1,3,2)
+        pcolor(vv1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        subplot(1,3,3)
+        pcolor(v1-vv1); shading interp; daspect([1, 1, 1]); colorbar;
 
         loaded = [-1000 -1000];
         index1=-10000;
@@ -113,7 +137,9 @@ for ti=1:N_Basetime
         urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
         vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
 
-       
+        %figure;
+        %pcolor(XST,YST,urhs1);shading interp;colorbar;
+        %title('velocity')
 %*******************************************************************
         x1 = x0 + urhs1*deltat/2;
         y1 = y0 + vrhs1*deltat/2;
@@ -186,8 +212,12 @@ for ti=1:N_Basetime
         %quiver(x0,y0,dx,dy)
         %title('quiverdxdy')
        
-        %figure;
-        %pcolor(XST,YST,dx);shading interp; colorbar; daspect([1 1 1]); 
+        figure;
+        plot(xnow,ynow,'.k'); daspect([1 1 1]); 
+        drawnow;
+        pause(.1)
+        
+        %pcolor(XST,YST,xnow);shading interp; colorbar; daspect([1 1 1]); 
         %title('dx')
 
         %Analytic soln for the linear flow:
@@ -212,19 +242,20 @@ for ti=1:N_Basetime
     
             error = max(max(errorX+errorY))
 
-            figure;
-            pcolor(XST,YST,abs(xnow-analyticSolnX)+abs(ynow-analyticSolnY));shading interp; colorbar; daspect([1 1 1]); 
-            title('error')
+            %figure;
+            %pcolor(XST,YST,abs(xnow-analyticSolnX)+abs(ynow-analyticSolnY));shading interp; colorbar; daspect([1 1 1]); 
+            %title('error')
     end
 
    
 
-    dle_2d_test;
     
 
     
 %Renew base time    
     start_time=start_time+BASESTEP;
 end
+    dle_2d_test;
+
 ss=strcat('save FTLEBTurb.mat FTLE');
 eval(ss);

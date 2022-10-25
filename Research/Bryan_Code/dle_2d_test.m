@@ -1,25 +1,24 @@
-%X=xnow;Y=ynow;
-X=analyticSolnX; Y=analyticSolnY; 
+X=xnow;Y=ynow;
+%X=analyticSolnX; Y=analyticSolnY; 
 
 xss=xa;yss=ya;
 
 
-X(1,1)
-X(1,2)
+%X(1,255)
+%X(1,256)
 %X(128,1)
 
 %[G12 G11] = gradient(X,yss,xss);
-%[G12 G11] = gradient(X);
 [G11, G12] = gradient(X,xss,yss);
 
 
-[G22 G21] = gradient(Y,yss,xss);
+[G21, G22] = gradient(Y,xss,yss);
 
-figure;
-quiver(xa,ya,G11,G12)
-title('Green1')
+%figure;
+%quiver(xa,ya,G11,G12)
+%title('Green1')
 
-G11(1,1)
+%G11(1,256)
 %G11(128,1)
 
 %G12(1,1)
