@@ -1,28 +1,33 @@
-X=xnow;Y=ynow;
+%X=xnow;Y=ynow;
+X=analyticSolnX; Y=analyticSolnY; 
+
 xss=xa;yss=ya;
 
 
-%X(1,1)
+X(1,1)
+X(1,2)
 %X(128,1)
 
-[G12 G11] = gradient(X,yss,xss);
+%[G12 G11] = gradient(X,yss,xss);
 %[G12 G11] = gradient(X);
+[G11, G12] = gradient(X,xss,yss);
+
 
 [G22 G21] = gradient(Y,yss,xss);
 
 figure;
 quiver(xa,ya,G11,G12)
-title('quiver')
+title('Green1')
 
 G11(1,1)
-G11(128,1)
+%G11(128,1)
 
-G12(1,1)
-G12(128,1)
+%G12(1,1)
+%G12(128,1)
 
-figure;
-quiver(xa,ya,G22,G21)
-title('quiver2')
+%figure;
+%quiver(xa,ya,G22,G21)
+%title('quiver2')
 
 
 %compute Cauchy-Green tensor
@@ -36,7 +41,7 @@ Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
 dle=log(lam)/2;
-[YSS XSS]=meshgrid(yss,xss);
+[XSS YSS]=meshgrid(xss,yss);
 
 % scrsz = get(0,'ScreenSize');
 % figure1=figure('Position',[50 50 scrsz(3)/3 scrsz(4)/1.5]);
@@ -51,7 +56,14 @@ title('FTLE')
 FTLE(:,:,ti)=dle;
 % eval(ssss);
 
-figure;
-pcolor(XSS,YSS,X);shading interp; colorbar; daspect([1 1 1]); 
-title('X')
+%figure;
+%pcolor(XSS,YSS,X);shading interp; colorbar; daspect([1 1 1]); 
+%title('X')
 
+figure;
+pcolor(XSS,YSS,G11);shading interp; colorbar; daspect([1 1 1]); 
+title('G11')
+
+figure;
+pcolor(XSS,YSS,G12);shading interp; colorbar; daspect([1 1 1]); 
+title('G12')

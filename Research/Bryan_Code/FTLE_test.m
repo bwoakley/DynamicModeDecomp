@@ -3,18 +3,12 @@ close all;
 clc;
 format long;
 
-global tprev lambda1 mu1 LAM MU;
-global thm thp tau_e phitot maxphi phi_t phim_t phip_t T Tflag Period;
-global tau_h sigma x_t y_t phi0o dir start_time maxtau_e tau_eseg;
-
 kk = 256;
 
-%Parameters for Bickley jet
 %Length of domain
-L = 3*1;
-%L = 2*pi
+L = 3;
 %Full period or time unit
-Period=1
+Period=1;
 
 %Case 
 CaseSTART=200-.2; %Start at t=0, find LCS at different base times
@@ -38,33 +32,22 @@ xx=x(1:end-1);
 xcoarse = linspace(0,L,256+1);
 ycoarse = linspace(0,L,256+1);
 xxcoarse = xcoarse(1:end-1);
-
-% x=x(150);y=y(80);
-% th=(0:2:359)/360*2*pi;
-% r=1e-3:1e-3:1e-1;
-% [TH R]=meshgrid(th,r);
-% xr=x+R.*cos(TH);
-% yr=y+R.*sin(TH);
+yycoarse = ycoarse(1:end-1);
 
 inter='*cubic';
 
-% x=-1:.1:1;y=0:.1:2;
-%x=2.62;y=-.085;
-M=length(x);N=length(y);
 xa=x(257:512);ya=y(257:512);
-[YST XST]=meshgrid(y(257:512),x(257:512)); 
-%XST=xr;
-%YST=yr;
+[XST, YST]=meshgrid(xa,ya); 
+
 Diff=CaseEND-CaseSTART;
-N_Basetime=Diff/(BASESTEP/Period)+1 %%# of base times for animation
+N_Basetime=Diff/(BASESTEP/Period)+1; %%# of base times for animation
 %%Set integration time
 start_time=CaseSTART;
-xt=XST;
-yt=YST;
+
 no_of_steps = INTTIME/abs(deltat);
 ft=.2;
 for ti=1:N_Basetime
-    Current_Base=(ti-1)*BASESTEP/Period
+    Current_Base=(ti-1)*BASESTEP/Period;
     
     xnow = XST;%-1e-6;
     ynow = YST;%+1e-6;
@@ -127,8 +110,8 @@ for ti=1:N_Basetime
         %vrhs1 = interp2(xx,xx,vinterp,ym,xm,inter,0);          
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs1 = interp2(xxcoarse,xxcoarse,uinterp,ym,xm,inter,0);
-        vrhs1 = interp2(xxcoarse,xxcoarse,vinterp,ym,xm,inter,0);
+        urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
 
        
 %*******************************************************************
@@ -153,8 +136,8 @@ for ti=1:N_Basetime
         %vrhs2 = interp2(xx,xx,vinterp,ym,xm,inter,0);
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs2 = interp2(xxcoarse,xxcoarse,uinterp,ym,xm,inter,0);
-        vrhs2 = interp2(xxcoarse,xxcoarse,vinterp,ym,xm,inter,0);
+        urhs2 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs2 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %*************************************************************
         x2 = x0 + urhs2*deltat/2;
         y2 = y0 + vrhs2*deltat/2;
@@ -167,8 +150,8 @@ for ti=1:N_Basetime
         %vrhs3 = interp2(xx,xx,vinterp,ym,xm,inter,0);   
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs3 = interp2(xxcoarse,xxcoarse,uinterp,ym,xm,inter,0);
-        vrhs3 = interp2(xxcoarse,xxcoarse,vinterp,ym,xm,inter,0);
+        urhs3 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs3 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %****************************************************************
         x3 = x0 + urhs3*deltat;
         y3 = y0 + vrhs3*deltat;
@@ -190,8 +173,8 @@ for ti=1:N_Basetime
         %vrhs4 = interp2(xx,xx,vinterp,ym,xm,inter,0); 
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs4 = interp2(xxcoarse,xxcoarse,uinterp,ym,xm,inter,0);
-        vrhs4 = interp2(xxcoarse,xxcoarse,vinterp,ym,xm,inter,0);
+        urhs4 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs4 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %********************************************************************   
     
         dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
@@ -199,15 +182,13 @@ for ti=1:N_Basetime
         xnow = xnow + dx;
         ynow = ynow + dy;
         
-        figure;
-        quiver(y0,x0,dx,dy)
-        %quiver(dx,dy)
-
-        title('quiverdxdy')
+        %figure;
+        %quiver(x0,y0,dx,dy)
+        %title('quiverdxdy')
        
-        figure;
-        pcolor(XST,YST,dx);shading interp; colorbar; daspect([1 1 1]); 
-        title('dx')
+        %figure;
+        %pcolor(XST,YST,dx);shading interp; colorbar; daspect([1 1 1]); 
+        %title('dx')
 
         %Analytic soln for the linear flow:
             analyticSolnX = exp(-1*deltat)*(x0-1.5)+1.5;
@@ -218,23 +199,27 @@ for ti=1:N_Basetime
             tempX = analyticSolnX-x0;
             tempY = analyticSolnY-y0;
             
-            figure;
-            pcolor(XST,YST,tempX);shading interp; colorbar; daspect([1 1 1]); 
-            title('analytic dx')
+            %figure;
+            %pcolor(XST,YST,tempX);shading interp; colorbar; daspect([1 1 1]); 
+            %title('analytic dx')
 
             %figure;
             %quiver(x0,y0,tempX,tempY)
             %title('quiver2')
     
-            %errorX = abs(xnow-analyticSolnX);
-            %errorY = abs(ynow-analyticSolnY);
+            errorX = abs(xnow-analyticSolnX);
+            errorY = abs(ynow-analyticSolnY);
     
-            %error = max(max(errorX+errorY));
+            error = max(max(errorX+errorY))
+
+            figure;
+            pcolor(XST,YST,abs(xnow-analyticSolnX)+abs(ynow-analyticSolnY));shading interp; colorbar; daspect([1 1 1]); 
+            title('error')
     end
 
    
 
-    dle_2d;
+    dle_2d_test;
     
 
     
