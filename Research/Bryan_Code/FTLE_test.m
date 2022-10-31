@@ -33,8 +33,10 @@ xcoarse = linspace(0,L,256+1);
 ycoarse = linspace(0,L,256+1);
 xxcoarse = xcoarse(1:end-1);
 yycoarse = ycoarse(1:end-1);
+[XSTcoarse, YSTcoarse]=meshgrid(xxcoarse,yycoarse); 
 
-inter='*cubic';
+%inter='*cubic';
+inter='*linear';
 
 xa=x(257:512);ya=y(257:512);
 [XST, YST]=meshgrid(xa,ya); 
@@ -56,8 +58,8 @@ for ti=1:N_Basetime
         i
         current_time = start_time + (i-1)*deltat;   
         x0 = xnow;
-        %min(min(x0))
-        %max(max(x0))
+        min(min(x0));
+        max(max(x0));
         y0 = ynow;
         t0 = current_time;
 
@@ -71,21 +73,28 @@ for ti=1:N_Basetime
         data=fread(fid,[1 inf],'*double');
         fclose(fid);
         data=reshape(data,kk,kk,3);
+
         u1 = data(:,:,1)' ;
-        uu1=(-XST+1.5)*3;
+        uuu1=(-XSTcoarse+1.5);
+        uu1=(-XST+1.5);
+
         v1 = data(:,:,2)' ;
-        vv1=(YST-1.5)*3;
+        vvv1=(YSTcoarse-1.5);
+        vv1=(YST-1.5);
 
-        %figure;
-        %subplot(1,3,1)
-        %pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
 
-        
+%         figure;
+%         subplot(1,3,1)
+%         pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         
 %         subplot(1,3,2)
-%         pcolor(uu1); shading interp; daspect([1, 1, 1]); colorbar;
+%         pcolor(uuu1); shading interp; daspect([1, 1, 1]); colorbar;
 % 
 %         subplot(1,3,3)
-%         pcolor(u1-uu1); shading interp; daspect([1, 1, 1]); colorbar;
+%         pcolor(u1-uuu1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         title('before')
 
 
 
@@ -96,22 +105,27 @@ for ti=1:N_Basetime
         data=fread(fid,[1 inf],'*double');
         fclose(fid);
         data=reshape(data,kk,kk,3);
+
         u2 = data(:,:,1)' ;
+        uuu2=(-XSTcoarse+1.5);
+
         v2 = data(:,:,2)' ;
-        uu2=(-XST+1.5)*3;
-        vv2=(YST-1.5)*3;
+        vvv2=(YSTcoarse-1.5);
+
+        uu2=(-XST+1.5);
+        vv2=(YST-1.5);
 
 
-         figure;
-        subplot(1,3,1)
-        pcolor(v1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        
-        subplot(1,3,2)
-        pcolor(vv1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        subplot(1,3,3)
-        pcolor(v1-vv1); shading interp; daspect([1, 1, 1]); colorbar;
+%         figure;
+%         subplot(1,3,1)
+%         pcolor(v1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         
+%         subplot(1,3,2)
+%         pcolor(vv1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         subplot(1,3,3)
+%         pcolor(v1-vv1); shading interp; daspect([1, 1, 1]); colorbar;
 
         loaded = [-1000 -1000];
         index1=-10000;
@@ -127,7 +141,7 @@ for ti=1:N_Basetime
         vinterp = v1 + (t0 - (index1-1)*ft)*(v2-v1)/ft;
 
         
-        
+       
 
         xm=mod(x0,L);ym=mod(y0,L);
         %urhs1 = interp2(xx,xx,uinterp,ym,xm,inter,0);
@@ -137,9 +151,36 @@ for ti=1:N_Basetime
         urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
         vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
 
-        %figure;
-        %pcolor(XST,YST,urhs1);shading interp;colorbar;
-        %title('velocity')
+
+
+%         min(min(xm))
+%         
+%         max(max(xm))
+% 
+%         min(min(xxcoarse))
+% 
+%         max(max(xxcoarse))
+        
+
+
+
+        figure;
+        subplot(1,3,1)
+        pcolor(urhs1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        
+        subplot(1,3,2)
+        pcolor(uu1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        subplot(1,3,3)
+        pcolor(urhs1-uu1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        title('after interp')
+
+
+%         figure;
+%         pcolor(urhs1);shading interp;colorbar;
+%         title('velocity')
 %*******************************************************************
         x1 = x0 + urhs1*deltat/2;
         y1 = y0 + vrhs1*deltat/2;
@@ -212,10 +253,10 @@ for ti=1:N_Basetime
         %quiver(x0,y0,dx,dy)
         %title('quiverdxdy')
        
-        figure;
-        plot(xnow,ynow,'.k'); daspect([1 1 1]); 
-        drawnow;
-        pause(.1)
+%         figure;
+%         plot(xnow,ynow,'.k'); daspect([1 1 1]); 
+%         drawnow;
+%         pause(.1)
         
         %pcolor(XST,YST,xnow);shading interp; colorbar; daspect([1 1 1]); 
         %title('dx')
