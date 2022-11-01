@@ -24,11 +24,14 @@ x=linspace(-.5,.5,kk+1);x=x(1:end-1);y=x;
 
 ss='Line';
 
-v = VideoWriter('SimVsAnaly.avi');
-%v = VideoWriter('ErrorPlot.avi');
+
+
+%v = VideoWriter('SimVsAnaly.avi');
+v = VideoWriter('ErrorPlot.avi');
 open(v)
 
 ERROR = zeros(1,N-999);
+ERRORSUM = zeros(1,N-999);
 
 for i = 1000 : 1 : N
      
@@ -70,7 +73,7 @@ for i = 1000 : 1 : N
 
     
 
-    if true
+    if false
         %put theta sim in first plot
              subplot(1,2,1)
     
@@ -120,6 +123,7 @@ for i = 1000 : 1 : N
     
     temp = zeros(kk,kk);
     VAR = 0;
+    ERRORSUMtemp = 0;
 
     for j = 1 : size(data,1)
         for k = 1 : size(data,2)
@@ -147,6 +151,7 @@ for i = 1000 : 1 : N
             temp(j,k) = abs(data(k,j) - theta(j,k)); %Why is data needing to be transposed?
 
             VAR = VAR + abs(theta(j,k))^2;
+            ERRORSUMtemp = ERRORSUMtemp + temp(j,k);
         end
     end
 
@@ -158,7 +163,7 @@ for i = 1000 : 1 : N
     
 
 
-    if true  
+    if false  
         subplot(1,2,2)
         pcolor(x,x,theta);shading interp;colorbar;
     
@@ -175,13 +180,16 @@ for i = 1000 : 1 : N
         %Instead of drawnow, save the movie in F
     end
 
+    ERRORSUM(i-999) = ERRORSUMtemp;
+
     ERROR(i-999) = max(max(temp)) ;
-        %pcolor(temp); shading interp; daspect([1, 1, 1]); colorbar;
+        pcolor(temp); shading interp; daspect([1, 1, 1]); colorbar;
         %drawnow;
         %pause(.1)
 
     frame = getframe(gcf);
     writeVideo(v,frame);
+    
 
 
     %writeVideo(v,data(:,:,1)')
@@ -197,6 +205,11 @@ for i = 1000 : 1 : N
 end
 
 close(v)
+
+
+
+
+
 
 
 %Just plot the initial condition.
@@ -278,10 +291,24 @@ for i = 1000 : 1 : N
 end
 
 
+
+
+
 plot(tt,ERROR)
 title('error(t) = max ( $ |\theta_{sim} - \theta_{analy}|$ )','interpreter','latex')
 xlabel('t')
 ylabel('error')
 
 saveas(gcf,'errorPlot.pdf')
+
+
+
+
+figure;
+plot(tt,ERRORSUM)
+title('error(t) =   $\sum |\theta_{sim} - \theta_{analy}|$ ','interpreter','latex')
+xlabel('t')
+ylabel('error')
+
+saveas(gcf,'errorSumPlot.pdf')
 

@@ -65,7 +65,7 @@ for ti=1:N_Basetime
         t0 = current_time;
 
         %data file name
-        ss='Lin3';
+        ss='Line';
 
         ii = i + 1000;
         st=strcat('../Cases/',ss,'/bin0',num2str(ii));
