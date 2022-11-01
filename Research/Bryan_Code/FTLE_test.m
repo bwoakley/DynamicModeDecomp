@@ -35,8 +35,9 @@ xxcoarse = xcoarse(1:end-1);
 yycoarse = ycoarse(1:end-1);
 [XSTcoarse, YSTcoarse]=meshgrid(xxcoarse,yycoarse); 
 
-%inter='*cubic';
-inter='*linear';
+inter='*cubic';
+%inter='*linear';
+%inter='linear';
 
 xa=x(257:512);ya=y(257:512);
 [XST, YST]=meshgrid(xa,ya); 
@@ -83,18 +84,45 @@ for ti=1:N_Basetime
         vv1=(YST-1.5);
 
 
-%         figure;
-%         subplot(1,3,1)
-%         pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
-% 
-%         
-%         subplot(1,3,2)
-%         pcolor(uuu1); shading interp; daspect([1, 1, 1]); colorbar;
-% 
-%         subplot(1,3,3)
-%         pcolor(u1-uuu1); shading interp; daspect([1, 1, 1]); colorbar;
-% 
-%         title('before')
+
+
+
+
+
+         figure;
+         subplot(1,3,1)
+         pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        
+        subplot(1,3,2)
+        pcolor(uuu1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        subplot(1,3,3)
+        pcolor(u1-uuu1); shading interp; daspect([1, 1, 1]); colorbar;
+
+        title('before')
+
+
+
+
+
+
+        figure;
+        plot(u1(100,:))
+        title('u1 row 100')
+
+        figure;
+        plot(uuu1(100,:))
+        title('uuu1 row 100')
+
+
+        errorDiff = u1-uuu1;
+
+        figure;
+        plot(errorDiff(100,:))
+        title('u1-uuu1 row 100')
+
+
 
 
 
@@ -116,16 +144,7 @@ for ti=1:N_Basetime
         vv2=(YST-1.5);
 
 
-%         figure;
-%         subplot(1,3,1)
-%         pcolor(v1); shading interp; daspect([1, 1, 1]); colorbar;
-% 
-%         
-%         subplot(1,3,2)
-%         pcolor(vv1); shading interp; daspect([1, 1, 1]); colorbar;
-% 
-%         subplot(1,3,3)
-%         pcolor(v1-vv1); shading interp; daspect([1, 1, 1]); colorbar;
+       
 
         loaded = [-1000 -1000];
         index1=-10000;
@@ -152,6 +171,16 @@ for ti=1:N_Basetime
         vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
 
 
+        %figure;
+        %plot(urhs1(1,:))
+
+        %u1(3,3)
+
+        %uu1(1,1)
+
+        %uinterp(1,1)
+
+        %urhs1(1,1)
 
 %         min(min(xm))
 %         
@@ -163,19 +192,18 @@ for ti=1:N_Basetime
         
 
 
-
-        figure;
-        subplot(1,3,1)
-        pcolor(urhs1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        
-        subplot(1,3,2)
-        pcolor(uu1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        subplot(1,3,3)
-        pcolor(urhs1-uu1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        title('after interp')
+%         figure;
+%         subplot(1,3,1)
+%         pcolor(urhs1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         
+%         subplot(1,3,2)
+%         pcolor(uu1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         subplot(1,3,3)
+%         pcolor(urhs1-uu1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         title('after interp')
 
 
 %         figure;
@@ -278,10 +306,14 @@ for ti=1:N_Basetime
             %quiver(x0,y0,tempX,tempY)
             %title('quiver2')
     
-            errorX = abs(xnow-analyticSolnX);
-            errorY = abs(ynow-analyticSolnY);
-    
-            error = max(max(errorX+errorY))
+
+
+%             errorX = abs(xnow-analyticSolnX);
+%             errorY = abs(ynow-analyticSolnY);
+%     
+%             error = max(max(errorX+errorY))
+
+
 
             %figure;
             %pcolor(XST,YST,abs(xnow-analyticSolnX)+abs(ynow-analyticSolnY));shading interp; colorbar; daspect([1 1 1]); 
