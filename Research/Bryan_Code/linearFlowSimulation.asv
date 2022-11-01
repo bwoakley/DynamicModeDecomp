@@ -158,7 +158,7 @@ for i = 1000 : 1 : N
     
 
 
-    if true  
+    if false  
         subplot(1,2,2)
         pcolor(x,x,theta);shading interp;colorbar;
     
@@ -176,7 +176,7 @@ for i = 1000 : 1 : N
     end
 
     ERROR(i-999) = max(max(temp)) ;
-        %pcolor(temp); shading interp; daspect([1, 1, 1]); colorbar;
+        pcolor(temp); shading interp; daspect([1, 1, 1]); colorbar;
         %drawnow;
         %pause(.1)
 
