@@ -1,2 +1,3 @@
-# ignore ALL files in the directory named temp
-Research/Cases/temp/
+# ignore ALL files in the code0/case1
+Research/Cases/code0/case1/*
+Research/Cases/code0/case2/*
