@@ -40,7 +40,7 @@ Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
 dle=log(lam)/2;
-[XSS YSS]=meshgrid(xss,yss);
+[XSS, YSS]=meshgrid(xss,yss);
 
 % scrsz = get(0,'ScreenSize');
 % figure1=figure('Position',[50 50 scrsz(3)/3 scrsz(4)/1.5]);
@@ -59,10 +59,13 @@ FTLE(:,:,ti)=dle;
 %pcolor(XSS,YSS,X);shading interp; colorbar; daspect([1 1 1]); 
 %title('X')
 
-figure;
-pcolor(XSS,YSS,G11);shading interp; colorbar; daspect([1 1 1]); 
-title('G11')
-
-figure;
-pcolor(XSS,YSS,G12);shading interp; colorbar; daspect([1 1 1]); 
-title('G12')
+% figure;
+% pcolor(XSS,YSS,G21);shading interp; colorbar; daspect([1 1 1]); 
+% title('G11')
+% 
+% figure;
+% pcolor(XSS,YSS,G22);shading interp; colorbar; daspect([1 1 1]); 
+% title('G12')
+% 
+% min(min(G21))
+% max(max(G21))

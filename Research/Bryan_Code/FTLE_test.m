@@ -75,52 +75,53 @@ for ti=1:N_Basetime
         fclose(fid);
         data=reshape(data,kk,kk,3);
 
-        u1 = data(:,:,1)' ;
-        uuu1=(-XSTcoarse+1.5);
-        uu1=(-XST+1.5);
+        %u1 = data(:,:,1)' ;
+        u1=(-XSTcoarse+1.5);
+        %uu1=(-XST+1.5);
 
-        v1 = data(:,:,2)' ;
-        vvv1=(YSTcoarse-1.5);
-        vv1=(YST-1.5);
-
-
+        %v1 = data(:,:,2)' ;
+        v1=(YSTcoarse-1.5);
+        %vv1=(YST-1.5);
 
 
 
-
-
-         figure;
-         subplot(1,3,1)
-         pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        
-        subplot(1,3,2)
-        pcolor(uuu1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        subplot(1,3,3)
-        pcolor(u1-uuu1); shading interp; daspect([1, 1, 1]); colorbar;
-
-        title('before')
+%           pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
 
 
 
 
+%          figure;
+%          subplot(1,3,1)
+%          pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         
+%         subplot(1,3,2)
+%         pcolor(uuu1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         subplot(1,3,3)
+%         pcolor(u1-uuu1); shading interp; daspect([1, 1, 1]); colorbar;
+% 
+%         title('before')
 
 
-        figure;
-        plot(u1(100,:))
-        title('u1 row 100')
-
-        figure;
-        plot(uuu1(100,:))
-        title('uuu1 row 100')
 
 
-        errorDiff = u1-uuu1;
 
-        figure;
-        plot(errorDiff(100,:))
-        title('u1-uuu1 row 100')
+% 
+%         figure;
+%         plot(u1(100,:))
+%         title('u1 row 100')
+% 
+%         figure;
+%         plot(uuu1(100,:))
+%         title('uuu1 row 100')
+% 
+% 
+%         errorDiff = u1-uuu1;
+% 
+%         figure;
+%         plot(errorDiff(100,:))
+%         title('u1-uuu1 row 100')
 
 
 
@@ -134,14 +135,14 @@ for ti=1:N_Basetime
         fclose(fid);
         data=reshape(data,kk,kk,3);
 
-        u2 = data(:,:,1)' ;
-        uuu2=(-XSTcoarse+1.5);
+        %u2 = data(:,:,1)' ;
+        u2=(-XSTcoarse+1.5);
 
-        v2 = data(:,:,2)' ;
-        vvv2=(YSTcoarse-1.5);
+        %v2 = data(:,:,2)' ;
+        v2=(YSTcoarse-1.5);
 
-        uu2=(-XST+1.5);
-        vv2=(YST-1.5);
+        %uu2=(-XST+1.5);
+        %vv2=(YST-1.5);
 
 
        
@@ -290,27 +291,39 @@ for ti=1:N_Basetime
         %title('dx')
 
         %Analytic soln for the linear flow:
-            analyticSolnX = exp(-1*deltat)*(x0-1.5)+1.5;
-            analyticSolnY = exp(deltat)*(y0-1.5)+1.5;
-                  
-            
-
-            tempX = analyticSolnX-x0;
-            tempY = analyticSolnY-y0;
-            
-            %figure;
-            %pcolor(XST,YST,tempX);shading interp; colorbar; daspect([1 1 1]); 
-            %title('analytic dx')
-
-            %figure;
-            %quiver(x0,y0,tempX,tempY)
-            %title('quiver2')
+%             analyticSolnX = exp(-1*deltat)*(x0-1.5)+1.5;
+%             analyticSolnY = exp(deltat)*(y0-1.5)+1.5;
+%                   
+%             x0(1,1)
+% 
+%             y0(1,1)
+% 
+%             analyticSolnX(1,1)
+% 
+%             analyticSolnY(1,1)
+% 
+%             tempX = analyticSolnX-x0;
+%             tempY = analyticSolnY-y0;
+%             
+%             figure;
+%             pcolor(XST,YST,tempX);shading interp; colorbar; daspect([1 1 1]); 
+%             title('analytic dx')
+% 
+%             figure;
+%             quiver(x0,y0,tempX,tempY)
+%             title('quiver2')
     
 
-
+%             xnow(1,1)
+%             ynow(1,1)
+% 
 %             errorX = abs(xnow-analyticSolnX);
 %             errorY = abs(ynow-analyticSolnY);
 %     
+%             figure;
+%             pcolor(xnow-analyticSolnX);shading interp; colorbar; daspect([1 1 1]); 
+%             title('xnow-analyticSolnX')
+% 
 %             error = max(max(errorX+errorY))
 
 
