@@ -1,2 +1,4 @@
-/Cases/** filter=lfs diff=lfs merge=lfs -text
+Research/Cases/** filter=lfs diff=lfs merge=lfs -text
+Research/code0/case1/* filter=lfs diff=lfs merge=lfs -text
+Research/code0/case2/* filter=lfs diff=lfs merge=lfs -text
 
