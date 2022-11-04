@@ -1,29 +1,8 @@
 X=xnow;Y=ynow;
 xss=xa;yss=ya;
 
-
-%X(1,1)
-%X(128,1)
-
-[G12 G11] = gradient(X,yss,xss);
-%[G12 G11] = gradient(X);
-
-[G22 G21] = gradient(Y,yss,xss);
-
-figure;
-quiver(xa,ya,G11,G12)
-title('quiver')
-
-G11(1,1)
-G11(128,1)
-
-G12(1,1)
-G12(128,1)
-
-figure;
-quiver(xa,ya,G22,G21)
-title('quiver2')
-
+[G11, G12] = gradient(X,xss,yss);
+[G21, G22] = gradient(Y,xss,yss);
 
 %compute Cauchy-Green tensor
 CG11 = G11.*G11 + G21.*G21 ;
@@ -35,23 +14,27 @@ CG22 = G12.*G12 + G22.*G22 ;
 Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
-dle=log(lam)/2;
-[YSS XSS]=meshgrid(yss,xss);
+dle=log(lam)/(2*INTTIME);
+[XSS, YSS]=meshgrid(xss,yss);
 
 % scrsz = get(0,'ScreenSize');
 % figure1=figure('Position',[50 50 scrsz(3)/3 scrsz(4)/1.5]);
 % % subplot(3,1,1)
+% figure;
+% pcolor(XSS,YSS,dle);shading interp; colorbar; daspect([1 1 1]); 
+% title('FTLE')
+
 figure;
-pcolor(XSS,YSS,dle);shading interp; colorbar; daspect([1 1 1]); 
-title('FTLE')
+pcolor(dle);shading interp; colorbar; daspect([1 1 1]); 
+title('FTLE 2')
 
 % set(gca,'fontsize',24)
 % daspect([1 1 1]); 
 
-FTLE(:,:,ti)=dle;
+%FTLE(:,:,ti)=dle;
+
 % eval(ssss);
 
-figure;
-pcolor(XSS,YSS,X);shading interp; colorbar; daspect([1 1 1]); 
-title('X')
-
+FTLEHigh = dle(201,73);
+FTLEMed = dle(120,143);
+FTLELow = dle(65,137);

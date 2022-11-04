@@ -56,7 +56,7 @@ for ti=1:N_Basetime
     ynow = YST;%+1e-6;
 
     for i = 1:no_of_steps
-        i
+        i;
         current_time = start_time + (i-1)*deltat;   
         x0 = xnow;
         min(min(x0));
@@ -85,8 +85,12 @@ for ti=1:N_Basetime
 
 
 
-%           pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
-
+%          pcolor(u1); shading interp; daspect([1, 1, 1]); colorbar;
+         %u1(250,1)
+         
+%          XSTcoarse(1,1)
+%          XSTcoarse(2,1)
+%          XSTcoarse(1,2)
 
 
 

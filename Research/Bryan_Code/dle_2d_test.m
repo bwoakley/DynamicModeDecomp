@@ -39,7 +39,7 @@ CG22 = G12.*G12 + G22.*G22 ;
 Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
-dle=log(lam)/2;
+dle=log(lam)/(2*INTTIME);
 [XSS, YSS]=meshgrid(xss,yss);
 
 % scrsz = get(0,'ScreenSize');
