@@ -1,5 +1,7 @@
-X=xnow;Y=ynow;
+X=xnow;Y=ynow; %Use these to compute net difference
 xss=xa;yss=ya;
+%X = xafter; Y = yafter; %Use these to compute incremental diff
+%xss = xbefore; yss = ybefore;
 
 [G11, G12] = gradient(X,xss,yss);
 [G21, G22] = gradient(Y,xss,yss);
@@ -14,8 +16,8 @@ CG22 = G12.*G12 + G22.*G22 ;
 Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
-dle=log(lam)/(2*INTTIME);
-%dle=log(lam)/(2*deltat);
+dle=log(lam)/(2*INTTIME);  %Use this for net difference
+%dle=log(lam)/(2*deltat);    %Use this for incremental diff
 [XSS, YSS]=meshgrid(xss,yss);
 
 % scrsz = get(0,'ScreenSize');

@@ -209,6 +209,16 @@ for ti=1:N_Basetime
     
         dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
         dy = (deltat/6)*(vrhs1 + 2*vrhs2 + 2*vrhs3 + vrhs4);
+  
+       %First call FTLE code to use xbefore = xnow and xafter
+       xbefore = xnow;
+       xafter = xnow + dx;
+       ybefore = ynow;
+       yafter = ynow + dy;
+       
+       dle_2d;
+
+       %Then update xnow:
         xnow = xnow + dx;
         ynow = ynow + dy;
         
@@ -220,7 +230,6 @@ for ti=1:N_Basetime
 %         pause(.1)
         
         %Now compute the FTLE at every time step
-         dle_2d;
 
     end
 
