@@ -9,6 +9,13 @@ kk = 256;
 L = 3;
 %Full period or time unit
 Period=1;
+%Find a point of high, med, low stretching. Here are the coords:
+rowIndexHigh = 201; %y-coord index of High
+colIndexHigh = 73; %x-coord index of High
+rowIndexMed = 120;
+colIndexMed = 143;
+rowIndexLow = 65;
+colIndexLow = 137;
 
 %Case 
 CaseSTART=200-.2; %Start at t=0, find LCS at different base times
@@ -56,12 +63,36 @@ for ti=1:N_Basetime
     xnow = XST;%-1e-6;
     ynow = YST;%+1e-6;
 
+    %Keep track of the position of the high, med, low particles.
+    xCoordHistoryHigh = zeros(1,no_of_steps);
+    yCoordHistoryHigh = zeros(1,no_of_steps);
+    xCoordHistoryMed = zeros(1,no_of_steps);
+    yCoordHistoryMed = zeros(1,no_of_steps);
+    xCoordHistoryLow = zeros(1,no_of_steps);
+    yCoordHistoryLow = zeros(1,no_of_steps);
+
+    %Keep track of the FTLE for high, med, low
+    FTLEHistoryHigh = zeros(1,no_of_steps);
+    FTLEHistoryMed = zeros(1,no_of_steps);
+    FTLEHistoryLow = zeros(1,no_of_steps);
+
+
     for i = 1:no_of_steps
         i;
         current_time = start_time + (i-1)*deltat;   
         x0 = xnow;
         y0 = ynow;
         t0 = current_time;
+
+
+        %Update the current particle location
+        xCoordHistoryHigh(i) = xnow(rowIndexHigh,colIndexHigh);
+        yCoordHistoryHigh(i) = ynow(rowIndexHigh,colIndexHigh);
+        xCoordHistoryMed(i) = xnow(rowIndexMed,colIndexMed);
+        yCoordHistoryMed(i) = ynow(rowIndexMed,colIndexMed);
+        xCoordHistoryLow(i) = xnow(rowIndexLow,colIndexLow);
+        yCoordHistoryLow(i) = ynow(rowIndexLow,colIndexLow);
+
 
         %data file name
         ss='Turb';
@@ -188,16 +219,38 @@ for ti=1:N_Basetime
 %         drawnow;
 %         pause(.1)
         
-     
+        %Now compute the FTLE at every time step
+         dle_2d;
+
     end
 
-    
+    figure;
+    c = linspace(1,10,length(xCoordHistoryHigh));
+    scatter(xCoordHistoryHigh,yCoordHistoryHigh,[],c,'filled')
+    hold on;
+    scatter(xCoordHistoryMed,yCoordHistoryMed,[],c,'d')
+    hold on;
+    scatter(xCoordHistoryLow,yCoordHistoryLow,[],c)
+    hold off;
+    xlim([1,2])
+    ylim([1,2])
+    title('particleHistory. solid = high, diamond = med, open circle = low')
+
+    figure;
+    subplot(3,1,1)
+    plot(FTLEHistoryHigh)
+    title('FTLE High')
+    subplot(3,1,2)
+    plot(FTLEHistoryMed)
+    title('FTLE Med')
+    subplot(3,1,3)
+    plot(FTLEHistoryLow)
+    title('FTLE Low')
 
     
 %Renew base time    
     start_time=start_time+BASESTEP;
 end
-    dle_2d;
 
 %ss=strcat('save FTLEBTurb.mat FTLE');
 %eval(ss);

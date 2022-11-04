@@ -15,18 +15,17 @@ Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
 dle=log(lam)/(2*INTTIME);
+%dle=log(lam)/(2*deltat);
 [XSS, YSS]=meshgrid(xss,yss);
 
 % scrsz = get(0,'ScreenSize');
 % figure1=figure('Position',[50 50 scrsz(3)/3 scrsz(4)/1.5]);
 % % subplot(3,1,1)
-% figure;
-% pcolor(XSS,YSS,dle);shading interp; colorbar; daspect([1 1 1]); 
-% title('FTLE')
 
-figure;
-pcolor(dle);shading interp; colorbar; daspect([1 1 1]); 
-title('FTLE 2')
+
+% figure;
+% pcolor(dle);shading interp; colorbar; daspect([1 1 1]); 
+% title('FTLE')
 
 % set(gca,'fontsize',24)
 % daspect([1 1 1]); 
@@ -35,6 +34,14 @@ title('FTLE 2')
 
 % eval(ssss);
 
-FTLEHigh = dle(201,73);
-FTLEMed = dle(120,143);
-FTLELow = dle(65,137);
+
+FTLEHistoryHigh(i) = dle(rowIndexHigh,colIndexHigh);
+FTLEHistoryMed(i) = dle(rowIndexMed,colIndexMed);
+FTLEHistoryLow(i) = dle(rowIndexLow,colIndexLow);
+
+
+
+
+
+
+
