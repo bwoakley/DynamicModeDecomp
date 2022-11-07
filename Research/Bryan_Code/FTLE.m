@@ -160,7 +160,7 @@ for ti=1:N_Basetime
         vinterp = v1 + (t1 - (index1-1)*ft)*(v2-v1)/ft;
 
         %xm=mod(x0,L);ym=mod(y0,L);
-        xm=mod(x1,L);ym=mod(y1,L);   %*************************************Wait, should this xm not update to mod(x1,L)???     
+        xm=mod(x1,L);ym=mod(y1,L);   %***********xm should update to mod(x1,L)   
         
         %urhs2 = interp2(xx,xx,uinterp,ym,xm,inter,0);
         %vrhs2 = interp2(xx,xx,vinterp,ym,xm,inter,0);
@@ -216,7 +216,6 @@ for ti=1:N_Basetime
        ybefore = ynow;
        yafter = ynow + dy;
        
-       dle_2d;
 
        %Then update xnow:
         xnow = xnow + dx;
@@ -232,6 +231,7 @@ for ti=1:N_Basetime
         %Now compute the FTLE at every time step
 
     end
+       dle_2d;
 
     figure;
     c = linspace(1,10,length(xCoordHistoryHigh));
@@ -245,16 +245,16 @@ for ti=1:N_Basetime
     ylim([1,2])
     title('particleHistory. solid = high, diamond = med, open circle = low')
 
-    figure;
-    subplot(3,1,1)
-    plot(FTLEHistoryHigh)
-    title('FTLE High')
-    subplot(3,1,2)
-    plot(FTLEHistoryMed)
-    title('FTLE Med')
-    subplot(3,1,3)
-    plot(FTLEHistoryLow)
-    title('FTLE Low')
+%     figure;
+%     subplot(3,1,1)
+%     plot(FTLEHistoryHigh)
+%     title('FTLE High')
+%     subplot(3,1,2)
+%     plot(FTLEHistoryMed)
+%     title('FTLE Med')
+%     subplot(3,1,3)
+%     plot(FTLEHistoryLow)
+%     title('FTLE Low')
 
     
 %Renew base time    
