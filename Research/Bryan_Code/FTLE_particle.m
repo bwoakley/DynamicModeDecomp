@@ -28,7 +28,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
-INTTIME=20*abs(deltat);
+INTTIME=49*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -216,9 +216,10 @@ for ti=1:N_Basetime
         dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
         dy = (deltat/6)*(vrhs1 + 2*vrhs2 + 2*vrhs3 + vrhs4);
   
-        i
-        if i == 20
-             figure;
+        
+%         if i == 20
+       if false
+            figure;
             quiver(u1,u2)
             title('flow')
 
@@ -345,9 +346,9 @@ for ti=1:N_Basetime
 
     dle_2d;
     
-    dleHigh = dle(rowIndexHigh,colIndexHigh);
-    dleMed = dle(rowIndexMed,colIndexMed);
-    dleLow = dle(rowIndexLow,colIndexLow);
+    FTLEHigh = dle(rowIndexHigh,colIndexHigh)
+    FTLEMed = dle(rowIndexMed,colIndexMed)
+    FTLELow = dle(rowIndexLow,colIndexLow)
 
 
 
@@ -367,19 +368,19 @@ for ti=1:N_Basetime
     subplot(3,1,1)
     plot(FTLEHistoryHigh)
     hold on;
-    plot(dleHigh*ones(1,no_of_steps))
+    plot(FTLEHigh*ones(1,no_of_steps))
     hold off;
     title('FTLE High')
     subplot(3,1,2)
     plot(FTLEHistoryMed) 
     hold on;
-    plot(dleMed*ones(1,no_of_steps))
+    plot(FTLEMed*ones(1,no_of_steps))
     hold off;
     title('FTLE Med')
     subplot(3,1,3)
     plot(FTLEHistoryLow)
     hold on;
-    plot(dleLow*ones(1,no_of_steps))
+    plot(FTLELow*ones(1,no_of_steps))
     hold off;
     title('FTLE Low')
 
