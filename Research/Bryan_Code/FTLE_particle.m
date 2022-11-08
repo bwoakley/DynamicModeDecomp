@@ -3,6 +3,7 @@ close all;
 clc;
 format long;
 
+
 kk = 256;
 
 %Length of domain
@@ -27,7 +28,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
-INTTIME=49*abs(deltat);
+INTTIME=20*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -106,6 +107,11 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u1 = data(:,:,1)' ;
         v1 = data(:,:,2)' ;
+
+
+%         figure;
+%         quiver(u1,v1)
+%         title('flow')
 
 
         ii2 = ii + 1;
@@ -210,28 +216,140 @@ for ti=1:N_Basetime
         dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
         dy = (deltat/6)*(vrhs1 + 2*vrhs2 + 2*vrhs3 + vrhs4);
   
-       %First call FTLE code to use xbefore = xnow and xafter
-       xbefore = xnow;
-       xafter = xnow + dx;
-       ybefore = ynow;
-       yafter = ynow + dy;
-       
-       dle_2d;
+        i
+        if i == 20
+             figure;
+            quiver(u1,u2)
+            title('flow')
+
+            figure;
+            quiver(dx,dy)
+            title('displacement')
+        end
 
        %Then update xnow:
         xnow = xnow + dx;
         ynow = ynow + dy;
         
-       
-       
-%         figure;
-%         plot(xnow,ynow,'.k'); daspect([1 1 1]); 
-%         drawnow;
-%         pause(.1)
-        
+
+
+
+
+%*******************************************************************
+%*******************************************************************
+
+
         %Now compute the FTLE at every time step
+        %This requires us to take a unif grid at this time step, and
+        %compute dx:
+
+
+        uinterp = u1 + (t0 - (index1-1)*ft)*(u2-u1)/ft;
+        vinterp = v1 + (t0 - (index1-1)*ft)*(v2-v1)/ft;
+
+        
+       
+
+        xm=mod(XST,L);ym=mod(YST,L);
+        %urhs1 = interp2(xx,xx,uinterp,ym,xm,inter,0);
+        %vrhs1 = interp2(xx,xx,vinterp,ym,xm,inter,0);          
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+        urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+
+
+%*******************************************************************
+        x1 = XST + urhs1*deltat/2;
+        y1 = YST + vrhs1*deltat/2;
+        %min(min(x1)) %Yes, x1 does leave the set [1,2]^2 a bit. So, we should mod it back.
+        %max(max(x1))
+        t1 = t0 + deltat/2;
+        index1n = floor(t1/ft) + 1;
+        if index1n~=index1
+            index1 = index1n;
+            index2 = index1 + 1;
+            %checkload;
+        end 
+        uinterp = u1 + (t1 - (index1-1)*ft)*(u2-u1)/ft;
+        vinterp = v1 + (t1 - (index1-1)*ft)*(v2-v1)/ft;
+
+        %xm=mod(XST,L);ym=mod(YST,L);
+        xm=mod(x1,L);ym=mod(y1,L);   %***********xm should update to mod(x1,L)   
+        
+        %urhs2 = interp2(xx,xx,uinterp,ym,xm,inter,0);
+        %vrhs2 = interp2(xx,xx,vinterp,ym,xm,inter,0);
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+        urhs2 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs2 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+ %*************************************************************
+        x2 = XST + urhs2*deltat/2;
+        y2 = YST + vrhs2*deltat/2;
+        t2 = t0 + deltat/2;   
+
+        %xm=mod(XST,L);ym=mod(YST,L);
+        xm=mod(x2,L);ym=mod(y2,L); 
+
+        %urhs3 = interp2(xx,xx,uinterp,ym,xm,inter,0);
+        %vrhs3 = interp2(xx,xx,vinterp,ym,xm,inter,0);   
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+        urhs3 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs3 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+ %****************************************************************
+        x3 = XST + urhs3*deltat;
+        y3 = YST + vrhs3*deltat;
+        t3 = t0 + deltat;
+        index1n = floor(t3/ft) + 1;
+        if index1n~=index1
+            index1 = index1n;
+            index2 = index1 + 1;
+            %checkload;
+        end 
+        
+        uinterp = u1 + (t3 - (index1-1)*ft)*(u2-u1)/ft;
+        vinterp = v1 + (t3 - (index1-1)*ft)*(v2-v1)/ft;
+        
+        %xm=mod(XST,L);ym=mod(YST,L);
+        xm=mod(x3,L);ym=mod(y3,L);  
+
+        %urhs4 = interp2(xx,xx,uinterp,ym,xm,inter,0);
+        %vrhs4 = interp2(xx,xx,vinterp,ym,xm,inter,0); 
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+        urhs4 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+        vrhs4 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+ %********************************************************************   
+    
+        dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
+        dy = (deltat/6)*(vrhs1 + 2*vrhs2 + 2*vrhs3 + vrhs4);
+       
+
+       %First call FTLE code to use xbefore = xnow and xafter
+       xbefore = XST;
+       xafter = XST + dx;
+       ybefore = YST;
+       yafter = YST + dy;
+       
+       dle_2d_particle;
+
+       FTLEHistoryHigh(i) = interp2(xa,ya,dle,xCoordHistoryHigh(i),yCoordHistoryHigh(i),inter,0);
+       FTLEHistoryMed(i) = interp2(xa,ya,dle,xCoordHistoryMed(i),yCoordHistoryMed(i),inter,0);
+       FTLEHistoryLow(i) =  interp2(xa,ya,dle,xCoordHistoryLow(i),yCoordHistoryLow(i),inter,0);
+
 
     end
+
+    
+
+    dle_2d;
+    
+    dleHigh = dle(rowIndexHigh,colIndexHigh);
+    dleMed = dle(rowIndexMed,colIndexMed);
+    dleLow = dle(rowIndexLow,colIndexLow);
+
+
 
     figure;
     c = linspace(1,10,length(xCoordHistoryHigh));
@@ -248,12 +366,21 @@ for ti=1:N_Basetime
     figure;
     subplot(3,1,1)
     plot(FTLEHistoryHigh)
+    hold on;
+    plot(dleHigh*ones(1,no_of_steps))
+    hold off;
     title('FTLE High')
     subplot(3,1,2)
-    plot(FTLEHistoryMed)
+    plot(FTLEHistoryMed) 
+    hold on;
+    plot(dleMed*ones(1,no_of_steps))
+    hold off;
     title('FTLE Med')
     subplot(3,1,3)
     plot(FTLEHistoryLow)
+    hold on;
+    plot(dleLow*ones(1,no_of_steps))
+    hold off;
     title('FTLE Low')
 
     

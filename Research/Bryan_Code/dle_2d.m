@@ -16,7 +16,8 @@ CG22 = G12.*G12 + G22.*G22 ;
 Tr=CG11+CG22;
 Del=CG11.*CG22-CG12.*CG21;
 lam=Tr/2+sqrt(Tr.^2-4*Del)/2;
-dle=log(lam)/(2*INTTIME);  %Use this for net difference
+%dle=log(lam)/(2);  
+dle=log(lam)/(2*INTTIME);            %Use this for net difference
 %dle=log(lam)/(2*deltat);    %Use this for incremental diff
 [XSS, YSS]=meshgrid(xss,yss);
 
@@ -37,9 +38,6 @@ title('FTLE')
 % eval(ssss);
 
 
-FTLEHistoryHigh(i) = dle(rowIndexHigh,colIndexHigh);
-FTLEHistoryMed(i) = dle(rowIndexMed,colIndexMed);
-FTLEHistoryLow(i) = dle(rowIndexLow,colIndexLow);
 
 
 

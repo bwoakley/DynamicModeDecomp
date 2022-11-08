@@ -3,6 +3,7 @@ close all;
 clc;
 format long;
 
+
 kk = 256;
 
 %Length of domain
@@ -71,10 +72,7 @@ for ti=1:N_Basetime
     xCoordHistoryLow = zeros(1,no_of_steps);
     yCoordHistoryLow = zeros(1,no_of_steps);
 
-    %Keep track of the FTLE for high, med, low
-    FTLEHistoryHigh = zeros(1,no_of_steps);
-    FTLEHistoryMed = zeros(1,no_of_steps);
-    FTLEHistoryLow = zeros(1,no_of_steps);
+    
 
 
     for i = 1:no_of_steps
@@ -210,12 +208,7 @@ for ti=1:N_Basetime
         dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
         dy = (deltat/6)*(vrhs1 + 2*vrhs2 + 2*vrhs3 + vrhs4);
   
-       %First call FTLE code to use xbefore = xnow and xafter
-       xbefore = xnow;
-       xafter = xnow + dx;
-       ybefore = ynow;
-       yafter = ynow + dy;
-       
+           
 
        %Then update xnow:
         xnow = xnow + dx;
@@ -228,10 +221,14 @@ for ti=1:N_Basetime
 %         drawnow;
 %         pause(.1)
         
-        %Now compute the FTLE at every time step
 
     end
-       dle_2d;
+    dle_2d;
+    
+
+    dle(rowIndexHigh,colIndexHigh);
+    dle(rowIndexMed,colIndexMed);
+    dle(rowIndexLow,colIndexLow);
 
     figure;
     c = linspace(1,10,length(xCoordHistoryHigh));
@@ -245,16 +242,8 @@ for ti=1:N_Basetime
     ylim([1,2])
     title('particleHistory. solid = high, diamond = med, open circle = low')
 
-%     figure;
-%     subplot(3,1,1)
-%     plot(FTLEHistoryHigh)
-%     title('FTLE High')
-%     subplot(3,1,2)
-%     plot(FTLEHistoryMed)
-%     title('FTLE Med')
-%     subplot(3,1,3)
-%     plot(FTLEHistoryLow)
-%     title('FTLE Low')
+ 
+
 
     
 %Renew base time    
@@ -263,3 +252,5 @@ end
 
 %ss=strcat('save FTLEBTurb.mat FTLE');
 %eval(ss);
+
+
