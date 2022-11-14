@@ -12,7 +12,7 @@ If edited diablo.f, inside code0:
 Produce data inside case1:
 	rm -f diablo.saved*; rm -f diablo_th01*; rm -f pos*; rm -f Thi; ../diablo;
 Copy data to Cases, from inside case1: (change case2 in 1 place, Lin5 in 2 places)
-	cd ..; cd ..; cd Cases/; rm -f Line/*; cd ..; cd code0/; cp -a case1/. ../Cases/Line/
+	cd ..; cd ..; cd Cases/; rm -f Turb/*; cd ..; cd code0/; cp -a case1/. ../Cases/Turb/
 Extract. If choosing new folder in Cases, edit res_to_dat to find.
 If edited res_to_dat, inside extract:
 	rm res_to_dat; make; ./res_to_dat;

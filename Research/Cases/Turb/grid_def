@@ -1,8 +1,3 @@
-!----*|--.---------.---------.---------.---------.---------.---------.-|-------|
-! grid_def, the portion of the header that defines the grid size for diablo.
-!----*|--.---------.---------.---------.---------.---------.---------.-|-------|
-      PARAMETER (NX=256)
-      PARAMETER (NY=1)
-      PARAMETER (NZ=256)
-      PARAMETER (N_TH=1)
-!----*|--.---------.---------.---------.---------.---------.---------.-|-------|
+version https://git-lfs.github.com/spec/v1
+oid sha256:a45abc9517dc82854574da423c53e780376b10cdd8f2becaeae4d5b7e0fc5234
+size 418
