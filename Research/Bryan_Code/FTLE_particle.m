@@ -11,12 +11,12 @@ L = 3;
 %Full period or time unit
 Period=1;
 %Find a point of high, med, low stretching. Here are the coords:
-rowIndexHigh = 201; %y-coord index of High
-colIndexHigh = 73; %x-coord index of High
-rowIndexMed = 120;
-colIndexMed = 143;
-rowIndexLow = 65;
-colIndexLow = 137;
+rowIndexHigh = 151; %y-coord index of High
+colIndexHigh = 95; %x-coord index of High
+rowIndexMed = 127;
+colIndexMed = 94;
+rowIndexLow = 144;
+colIndexLow = 64;
 
 %Case 
 CaseSTART=200-.2; %Start at t=0, find LCS at different base times
@@ -28,7 +28,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
-INTTIME=49*abs(deltat);
+INTTIME=99*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -36,13 +36,20 @@ INTTIME=49*abs(deltat);
 x=linspace(0,L,256*3+1); 
 y=linspace(0,L,256*3+1);
 xx=x(1:end-1);
+yy=y(1:end-1);
+
 %Above is a large grid, but my data is not defined on a 768 grid... 
-%Instead we will define it on a 256 grid that still spans the whole length L
-xcoarse = linspace(0,L,256+1);
-ycoarse = linspace(0,L,256+1);
-xxcoarse = xcoarse(1:end-1);
-yycoarse = ycoarse(1:end-1);
-[XSTcoarse, YSTcoarse]=meshgrid(xxcoarse,yycoarse); 
+
+    %Instead we will define it on a 256 grid that still spans the whole length L
+    xcoarse = linspace(0,L,256+1);
+    ycoarse = linspace(0,L,256+1);
+    xxcoarse = xcoarse(1:end-1);
+    yycoarse = ycoarse(1:end-1);
+    [XSTcoarse, YSTcoarse]=meshgrid(xxcoarse,yycoarse); 
+
+    %Instead of coarse --> interp to xa, lets just take 3 copies of  the
+    %flow...
+
 
 inter='*cubic';
 %inter='*linear';
@@ -56,7 +63,7 @@ N_Basetime=Diff/(BASESTEP/Period)+1; %%# of base times for animation
 %%Set integration time
 start_time=CaseSTART;
 
-no_of_steps = INTTIME/abs(deltat);
+no_of_steps = round(INTTIME/abs(deltat));
 ft=.2;
 for ti=1:N_Basetime
     Current_Base=(ti-1)*BASESTEP/Period;
@@ -107,11 +114,12 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u1 = data(:,:,1)' ;
         v1 = data(:,:,2)' ;
+        u1Extend = [u1, u1, u1; u1, u1, u1; u1, u1, u1];
+        v1Extend = [v1, v1, v1; v1, v1, v1; v1, v1, v1];
+        u1 = u1Extend;
+        v1 = v1Extend;
 
 
-%         figure;
-%         quiver(u1,v1)
-%         title('flow')
 
 
         ii2 = ii + 1;
@@ -123,7 +131,12 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u2 = data(:,:,1)' ;
         v2 = data(:,:,2)' ;
-       
+        u2Extend = [u2, u2, u2; u2, u2, u2; u2, u2, u2];
+        v2Extend = [v2, v2, v2; v2, v2, v2; v2, v2, v2];
+        u2 = u2Extend;
+        v2 = v2Extend;
+
+        
 
         loaded = [-1000 -1000];
         index1=-10000;
@@ -135,21 +148,28 @@ for ti=1:N_Basetime
             %run this check to save loading time
             %checkload;
         end     
+        %t0 - (index1-1)*ft
         uinterp = u1 + (t0 - (index1-1)*ft)*(u2-u1)/ft;
         vinterp = v1 + (t0 - (index1-1)*ft)*(v2-v1)/ft;
 
-        
+%         figure;
+%         quiver(uinterp,vinterp)
+%         title('flow')
        
+        
 
         xm=mod(x0,L);ym=mod(y0,L);
-        %urhs1 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs1 = interp2(xx,xx,vinterp,ym,xm,inter,0);          
+        urhs1 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs1 = interp2(xx,yy,vinterp,xm,ym,inter,0);          
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+       
 
-
+%         figure;
+%         quiver(urhs1,vrhs1)
+%         title('flow')
 %*******************************************************************
         x1 = x0 + urhs1*deltat/2;
         y1 = y0 + vrhs1*deltat/2;
@@ -168,12 +188,12 @@ for ti=1:N_Basetime
         %xm=mod(x0,L);ym=mod(y0,L);
         xm=mod(x1,L);ym=mod(y1,L);   %***********xm should update to mod(x1,L)   
         
-        %urhs2 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs2 = interp2(xx,xx,vinterp,ym,xm,inter,0);
+        urhs2 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs2 = interp2(xx,yy,vinterp,xm,ym,inter,0);
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs2 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs2 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs2 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs2 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %*************************************************************
         x2 = x0 + urhs2*deltat/2;
         y2 = y0 + vrhs2*deltat/2;
@@ -182,12 +202,12 @@ for ti=1:N_Basetime
         %xm=mod(x0,L);ym=mod(y0,L);
         xm=mod(x2,L);ym=mod(y2,L); 
 
-        %urhs3 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs3 = interp2(xx,xx,vinterp,ym,xm,inter,0);   
+        urhs3 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs3 = interp2(xx,yy,vinterp,xm,ym,inter,0);   
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs3 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs3 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs3 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs3 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %****************************************************************
         x3 = x0 + urhs3*deltat;
         y3 = y0 + vrhs3*deltat;
@@ -205,12 +225,12 @@ for ti=1:N_Basetime
         %xm=mod(x0,L);ym=mod(y0,L);
         xm=mod(x3,L);ym=mod(y3,L);  
 
-        %urhs4 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs4 = interp2(xx,xx,vinterp,ym,xm,inter,0); 
+        urhs4 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs4 = interp2(xx,yy,vinterp,xm,ym,inter,0); 
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs4 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs4 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs4 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs4 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %********************************************************************   
     
         dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
@@ -252,12 +272,12 @@ for ti=1:N_Basetime
        
 
         xm=mod(XST,L);ym=mod(YST,L);
-        %urhs1 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs1 = interp2(xx,xx,vinterp,ym,xm,inter,0);          
+        urhs1 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs1 = interp2(xx,yy,vinterp,xm,ym,inter,0);          
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
 
 
 %*******************************************************************
@@ -278,12 +298,12 @@ for ti=1:N_Basetime
         %xm=mod(XST,L);ym=mod(YST,L);
         xm=mod(x1,L);ym=mod(y1,L);   %***********xm should update to mod(x1,L)   
         
-        %urhs2 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs2 = interp2(xx,xx,vinterp,ym,xm,inter,0);
+        urhs2 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs2 = interp2(xx,yy,vinterp,xm,ym,inter,0);
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs2 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs2 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs2 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs2 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %*************************************************************
         x2 = XST + urhs2*deltat/2;
         y2 = YST + vrhs2*deltat/2;
@@ -292,12 +312,12 @@ for ti=1:N_Basetime
         %xm=mod(XST,L);ym=mod(YST,L);
         xm=mod(x2,L);ym=mod(y2,L); 
 
-        %urhs3 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs3 = interp2(xx,xx,vinterp,ym,xm,inter,0);   
+        urhs3 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs3 = interp2(xx,yy,vinterp,xm,ym,inter,0);   
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs3 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs3 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs3 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs3 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %****************************************************************
         x3 = XST + urhs3*deltat;
         y3 = YST + vrhs3*deltat;
@@ -315,12 +335,12 @@ for ti=1:N_Basetime
         %xm=mod(XST,L);ym=mod(YST,L);
         xm=mod(x3,L);ym=mod(y3,L);  
 
-        %urhs4 = interp2(xx,xx,uinterp,ym,xm,inter,0);
-        %vrhs4 = interp2(xx,xx,vinterp,ym,xm,inter,0); 
+        urhs4 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs4 = interp2(xx,yy,vinterp,xm,ym,inter,0); 
             %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
             %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
-        urhs4 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
-        vrhs4 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+                %urhs4 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs4 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
  %********************************************************************   
     
         dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
@@ -391,3 +411,4 @@ end
 
 %ss=strcat('save FTLEBTurb.mat FTLE');
 %eval(ss);
+
