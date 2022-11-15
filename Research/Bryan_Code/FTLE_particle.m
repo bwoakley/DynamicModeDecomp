@@ -536,11 +536,30 @@ for ti=1:N_Basetime
                 colIndex = colIndexHigh;
             elseif caseSelect == 2
                 rowIndex = rowIndexMed;
-                colIndex = colIndexHigh;
+                colIndex = colIndexMed;
             else
                 rowIndex = rowIndexLow;
-                colIndex = colIndexHigh;
+                colIndex = colIndexLow;
             end
+
+%             if caseSelect == 1
+% 
+%                 figure;
+%                 quiver(u1Data,v1Data)
+%     
+%                rowIndexHigh
+%                colIndexHigh
+% 
+%                u1Data(rowIndexHigh,colIndexHigh)
+% 
+%                v1Data(rowIndexHigh,colIndexHigh)
+%             end
+
+%             A11 = (256/2)*(u1Data(rowIndex,colIndex+1) - u1Data(rowIndex,colIndex-1));
+%             A12 = (256/2)*(u1Data(rowIndex+1,colIndex) - u1Data(rowIndex-1,colIndex));
+%     
+%             A21 = (256/2)*(v1Data(rowIndex,colIndex+1) - v1Data(rowIndex,colIndex-1));
+%             A22 = (256/2)*(v1Data(rowIndex+1,colIndex) - v1Data(rowIndex-1,colIndex));
 
             A11 = (256/2)*(u1Data(rowIndex+1,colIndex) - u1Data(rowIndex-1,colIndex));
             A12 = (256/2)*(u1Data(rowIndex,colIndex+1) - u1Data(rowIndex,colIndex-1));
@@ -554,7 +573,9 @@ for ti=1:N_Basetime
 
             lamA = eig(ASym);
             LAM = lamA(2);
-            strain=log(LAM);  %Use this for incremental diff
+            strain=log(LAM); 
+           
+%             mustBeReal(LAM)
 
             if caseSelect == 1
                 StrainHistoryHigh(i) = strain;
