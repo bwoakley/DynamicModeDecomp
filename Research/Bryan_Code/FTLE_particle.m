@@ -29,6 +29,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
+%INTTIME=99*abs(deltat);
 INTTIME=99*abs(deltat);
 %INTTIME=.99*Period;
 
@@ -126,11 +127,28 @@ for ti=1:N_Basetime
         u1 = data(:,:,1)' ;
         v1 = data(:,:,2)' ;
 
+%         if i == 1
+%             u1temp = u1;
+%             v1temp = v1;
+%             
+%         else
+%             u1 = u1temp;
+%             v1 = v1temp;
+%         end
+
+%         u1 = -(XST-1.5);
+%         v1 = YST-1.5;
+
+%         figure;
+%         quiver(u1,v1)
+
         u1Data=u1;
         v1Data=v1;
 
         u1Extend = [u1, u1, u1; u1, u1, u1; u1, u1, u1];
         v1Extend = [v1, v1, v1; v1, v1, v1; v1, v1, v1];
+
+
         u1 = u1Extend;
         v1 = v1Extend;
 
@@ -147,6 +165,12 @@ for ti=1:N_Basetime
         u2 = data(:,:,1)' ;
         v2 = data(:,:,2)' ;
 
+%         u2 = -(XST-1.5);
+%         v2 = YST-1.5;
+        
+%         u2 = u1temp;
+%         v2 = v1temp;
+%         errorFlow =  max( max ( abs(u1temp - u2) + abs(v1temp - v2)));
 
 
         u2Extend = [u2, u2, u2; u2, u2, u2; u2, u2, u2];
@@ -531,16 +555,18 @@ for ti=1:N_Basetime
             
             %We want to compare this FTLE 4 particle to Strain 4 particle:
 
-            if caseSelect == 1
-                rowIndex = rowIndexHigh;
-                colIndex = colIndexHigh;
-            elseif caseSelect == 2
-                rowIndex = rowIndexMed;
-                colIndex = colIndexMed;
-            else
-                rowIndex = rowIndexLow;
-                colIndex = colIndexLow;
-            end
+           
+
+%              if caseSelect == 1
+%                 rowIndex = rowIndexHigh;
+%                 colIndex = colIndexHigh;
+%             elseif caseSelect == 2
+%                 rowIndex = rowIndexMed;
+%                 colIndex = colIndexMed;
+%             else
+%                 rowIndex = rowIndexLow;
+%                 colIndex = colIndexLow;
+%             end
 
 %             if caseSelect == 1
 % 
@@ -561,20 +587,36 @@ for ti=1:N_Basetime
 %             A21 = (256/2)*(v1Data(rowIndex,colIndex+1) - v1Data(rowIndex,colIndex-1));
 %             A22 = (256/2)*(v1Data(rowIndex+1,colIndex) - v1Data(rowIndex-1,colIndex));
 
-            A11 = (256/2)*(u1Data(rowIndex+1,colIndex) - u1Data(rowIndex-1,colIndex));
-            A12 = (256/2)*(u1Data(rowIndex,colIndex+1) - u1Data(rowIndex,colIndex-1));
-    
-            A21 = (256/2)*(v1Data(rowIndex+1,colIndex) - v1Data(rowIndex-1,colIndex));
-            A22 = (256/2)*(v1Data(rowIndex,colIndex+1) - v1Data(rowIndex,colIndex-1));
+%             A11 = (256/2)*(u1Data(rowIndex+1,colIndex) - u1Data(rowIndex-1,colIndex));
+%             A12 = (256/2)*(u1Data(rowIndex,colIndex+1) - u1Data(rowIndex,colIndex-1));
+%     
+%             A21 = (256/2)*(v1Data(rowIndex+1,colIndex) - v1Data(rowIndex-1,colIndex));
+%             A22 = (256/2)*(v1Data(rowIndex,colIndex+1) - v1Data(rowIndex,colIndex-1));
             
+%             pointsXX
+% 
+%             pointsYY
+
+            u1points = interp2(xa,ya,u1Data,pointsXX,pointsYY,inter,0);
+            v1points = interp2(xa,ya,v1Data,pointsXX,pointsYY,inter,0);
+
+
+            A11 = (1/(2*h))*(u1points(2,2+1) - u1points(2,2-1));
+            A12 = (1/(2*h))*(u1points(2+1,2) - u1points(2-1,2));
+    
+            A21 = (1/(2*h))*(v1points(2,2+1) - v1points(2,2-1));
+            A22 = (1/(2*h))*(v1points(2+1,2) - v1points(2-1,2));
+
+
             A = [A11, A12; A21, A22];
 
             ASym = .5*(A + A');
 
             lamA = eig(ASym);
             LAM = lamA(2);
-            strain=log(LAM); 
-           
+            %strain=log(LAM); %Strain should be log(LAM) ?
+            strain = LAM;     %Then it is e^strain that should = FTLE
+
 %             mustBeReal(LAM)
 
             if caseSelect == 1
@@ -599,6 +641,12 @@ for ti=1:N_Basetime
     FTLELow = dle(rowIndexLow,colIndexLow);
 
 
+%     %Looks like strain needs to be shifted. 
+%     for index3 = 1:no_of_steps-1
+%         StrainHistoryHigh(index3) = StrainHistoryHigh(index3 + 1) ;
+%         StrainHistoryMed(index3) = StrainHistoryMed(index3 + 1) ;
+%         StrainHistoryLow(index3) = StrainHistoryLow(index3 + 1) ;
+%     end
 
     figure;
     c = linspace(1,10,length(xCoordHistoryHigh));
@@ -614,39 +662,39 @@ for ti=1:N_Basetime
 
     figure;
     subplot(3,1,1)
-    plot(FTLEHistoryHigh,'k')
+    plot(FTLEHistoryHigh,'k-')
     hold on;
-    plot(FTLEHistoryHighPoints,'b')
+    plot(FTLEHistoryHighPoints,'b--')
     hold on;
-    plot(StrainHistoryHigh,'r')
+    plot(StrainHistoryHigh,'r:')
     hold on;
-    plot(FTLEHigh*ones(1,no_of_steps))
+    plot(FTLEHigh*ones(1,no_of_steps),'-.')
     hold off;
-    legend('FTLE increment','FTLE 4 Points','Strain increment','Net FTLE')
+    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE')
     title('FTLE High')
 
     subplot(3,1,2)
-    plot(FTLEHistoryMed,'k') 
+    plot(FTLEHistoryMed,'k-') 
     hold on;
-    plot(FTLEHistoryMedPoints,'b')
+    plot(FTLEHistoryMedPoints,'b--')
     hold on;
-    plot(StrainHistoryMed,'r')
+    plot(StrainHistoryMed,'r:')
     hold on;
-    plot(FTLEMed*ones(1,no_of_steps))
+    plot(FTLEMed*ones(1,no_of_steps),'-.')
     hold off;
-    legend('FTLE increment','FTLE 4 Points','Strain increment','Net FTLE')
+    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE')
     title('FTLE Med')
 
     subplot(3,1,3)
-    plot(FTLEHistoryLow,'k')
+    plot(FTLEHistoryLow,'k-')
     hold on;
-    plot(FTLEHistoryLowPoints,'b')
+    plot(FTLEHistoryLowPoints,'b--')
     hold on;
-    plot(StrainHistoryLow,'r')
+    plot(StrainHistoryLow,'r:')
     hold on;
-    plot(FTLELow*ones(1,no_of_steps))
+    plot(FTLELow*ones(1,no_of_steps),'-.')
     hold off;
-    legend('FTLE increment','FTLE 4 Points','Strain increment','Net FTLE')
+    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE')
     title('FTLE Low')
 
     
