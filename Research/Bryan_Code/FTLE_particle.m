@@ -74,12 +74,12 @@ for ti=1:N_Basetime
     ynow = YST;%+1e-6;
 
     %Keep track of the position of the high, med, low particles.
-    xCoordHistoryHigh = zeros(1,no_of_steps);
-    yCoordHistoryHigh = zeros(1,no_of_steps);
-    xCoordHistoryMed = zeros(1,no_of_steps);
-    yCoordHistoryMed = zeros(1,no_of_steps);
-    xCoordHistoryLow = zeros(1,no_of_steps);
-    yCoordHistoryLow = zeros(1,no_of_steps);
+    xCoordHistoryHigh = zeros(1,no_of_steps+1);
+    yCoordHistoryHigh = zeros(1,no_of_steps+1);
+    xCoordHistoryMed = zeros(1,no_of_steps+1);
+    yCoordHistoryMed = zeros(1,no_of_steps+1);
+    xCoordHistoryLow = zeros(1,no_of_steps+1);
+    yCoordHistoryLow = zeros(1,no_of_steps+1);
 
     %Keep track of the FTLE for high, med, low
     FTLEHistoryHigh = zeros(1,no_of_steps);
@@ -97,6 +97,20 @@ for ti=1:N_Basetime
     StrainHistoryMed = zeros(1,no_of_steps);
     StrainHistoryLow = zeros(1,no_of_steps);
 
+    %Update the current particle location
+    xCoordHistoryHigh(1) = XST(rowIndexHigh,colIndexHigh);
+    yCoordHistoryHigh(1) = YST(rowIndexHigh,colIndexHigh);
+    xCoordHistoryMed(1) = XST(rowIndexMed,colIndexMed);
+    yCoordHistoryMed(1) = YST(rowIndexMed,colIndexMed);
+    xCoordHistoryLow(1) = XST(rowIndexLow,colIndexLow);
+    yCoordHistoryLow(1) = YST(rowIndexLow,colIndexLow);
+
+    %Keep track of the FTLE for high, med, low
+    FTLENetHistoryHigh = zeros(1,no_of_steps);
+    FTLENetHistoryMed = zeros(1,no_of_steps);
+    FTLENetHistoryLow = zeros(1,no_of_steps);
+
+
     for i = 1:no_of_steps
         i;
         current_time = start_time + (i-1)*deltat;   
@@ -105,13 +119,7 @@ for ti=1:N_Basetime
         t0 = current_time;
 
 
-        %Update the current particle location
-        xCoordHistoryHigh(i) = xnow(rowIndexHigh,colIndexHigh);
-        yCoordHistoryHigh(i) = ynow(rowIndexHigh,colIndexHigh);
-        xCoordHistoryMed(i) = xnow(rowIndexMed,colIndexMed);
-        yCoordHistoryMed(i) = ynow(rowIndexMed,colIndexMed);
-        xCoordHistoryLow(i) = xnow(rowIndexLow,colIndexLow);
-        yCoordHistoryLow(i) = ynow(rowIndexLow,colIndexLow);
+        
 
 
         %data file name
@@ -292,7 +300,22 @@ for ti=1:N_Basetime
         
 
 
+        %Update the current particle location
+        xCoordHistoryHigh(i+1) = xnow(rowIndexHigh,colIndexHigh);
+        yCoordHistoryHigh(i+1) = ynow(rowIndexHigh,colIndexHigh);
+        xCoordHistoryMed(i+1) = xnow(rowIndexMed,colIndexMed);
+        yCoordHistoryMed(i+1) = ynow(rowIndexMed,colIndexMed);
+        xCoordHistoryLow(i+1) = xnow(rowIndexLow,colIndexLow);
+        yCoordHistoryLow(i+1) = ynow(rowIndexLow,colIndexLow);
 
+
+        dle_2d;
+    
+        rescaleDle = INTTIME*dle/(deltat*i);
+
+        FTLENetHistoryHigh(i) = rescaleDle(rowIndexHigh,colIndexHigh);
+        FTLENetHistoryMed(i) = rescaleDle(rowIndexMed,colIndexMed);
+        FTLENetHistoryLow(i) = rescaleDle(rowIndexLow,colIndexLow);
 
 %*******************************************************************
 %*******************************************************************
@@ -405,7 +428,7 @@ for ti=1:N_Basetime
 
         %This time, compute the FTLE at every time step a different way.
         %Consider 4 points close to my trajectory.
-        h = 1/(256*20);
+        h = 1/(256*30);
         %Select High, Med, Low
         for caseSelect = 1:3
             if caseSelect == 1
@@ -669,8 +692,10 @@ for ti=1:N_Basetime
     plot(StrainHistoryHigh,'r:')
     hold on;
     plot(FTLEHigh*ones(1,no_of_steps),'-.')
+    hold on;
+    plot(FTLENetHistoryHigh,'LineWidth',2)
     hold off;
-    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE')
+    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE','Net FTLE History')
     title('FTLE High')
 
     subplot(3,1,2)
@@ -681,8 +706,10 @@ for ti=1:N_Basetime
     plot(StrainHistoryMed,'r:')
     hold on;
     plot(FTLEMed*ones(1,no_of_steps),'-.')
+    hold on;
+    plot(FTLENetHistoryMed,'LineWidth',2)
     hold off;
-    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE')
+    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE','Net FTLE History')
     title('FTLE Med')
 
     subplot(3,1,3)
@@ -693,8 +720,10 @@ for ti=1:N_Basetime
     plot(StrainHistoryLow,'r:')
     hold on;
     plot(FTLELow*ones(1,no_of_steps),'-.')
+    hold on;
+    plot(FTLENetHistoryLow,'LineWidth',2)
     hold off;
-    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE')
+    legend('FTLE increment','FTLE 4 Points','Strain 4 Points','Net FTLE','Net FTLE History')
     title('FTLE Low')
 
     
