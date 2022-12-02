@@ -30,7 +30,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
 %INTTIME=99*abs(deltat);
-INTTIME=99*abs(deltat);
+INTTIME=3*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -64,6 +64,9 @@ Diff=CaseEND-CaseSTART;
 N_Basetime=Diff/(BASESTEP/Period)+1; %%# of base times for animation
 %%Set integration time
 start_time=CaseSTART;
+
+
+
 
 no_of_steps = round(INTTIME/abs(deltat));
 ft=.2;
@@ -110,6 +113,31 @@ for ti=1:N_Basetime
     FTLENetHistoryMed = zeros(1,no_of_steps);
     FTLENetHistoryLow = zeros(1,no_of_steps);
 
+    %Keep track of a circle of points near a chosen trajectory.
+    caseSelectCircle = 3;   %1 = high, 2 = med, 3 = low
+    N = 1000;               %Number of angles
+    hh = 1/(256*10);        %Radius of initial circle
+    vxHistory = zeros(N,no_of_steps+1);
+    vyHistory = zeros(N,no_of_steps+1);
+    vxHistoryPlot = zeros(N,no_of_steps+1);
+    vyHistoryPlot = zeros(N,no_of_steps+1);
+    thetaRange = linspace(0, 2*pi, N);
+    for theta = 1:N
+        vxHistoryPlot(theta,1) = cos(thetaRange(theta));
+        vyHistoryPlot(theta,1) = sin(thetaRange(theta));
+        if caseSelectCircle == 1
+            vxHistory(theta,1) = hh*vxHistoryPlot(theta,1)+xCoordHistoryHigh(1);
+            vyHistory(theta,1) = hh*vyHistoryPlot(theta,1)+yCoordHistoryHigh(1);
+        elseif caseSelectCircle == 2
+            vxHistory(theta,1) = hh*vxHistoryPlot(theta,1)+xCoordHistoryMed(1);
+            vyHistory(theta,1) = hh*vyHistoryPlot(theta,1)+yCoordHistoryMed(1);
+        else
+            vxHistory(theta,1) = hh*vxHistoryPlot(theta,1)+xCoordHistoryLow(1);
+            vyHistory(theta,1) = hh*vyHistoryPlot(theta,1)+yCoordHistoryLow(1);
+        end
+    end
+    v = VideoWriter('LowStretch.avi');
+    open(v)
 
     for i = 1:no_of_steps
         i;
@@ -653,6 +681,29 @@ for ti=1:N_Basetime
         end
 
 
+
+        
+        %*******************************************************************
+        %*******************************************************************
+
+
+        %Now I wish to focus on a particle trajectory (like Low FTLE), and
+        %see how the nearby points evolve. Take a circle of nearby points
+        %and plot the following ellipses as a movie:
+
+        %First plot initial circle in red
+        scatter(vxHistoryPlot(:,1),vyHistoryPlot(:,1),2,'filled','r') 
+        xlim([-1.5 1.5])
+        ylim([-1.5 1.5])
+        pbaspect([1 1 1])
+        %Then plot the current ellipse.
+%         hold on;
+% 
+% 
+%         hold off;
+
+        frame = getframe(gcf);
+        writeVideo(v,frame);
     end
 
     
@@ -727,6 +778,11 @@ for ti=1:N_Basetime
     title('FTLE Low')
 
     
+
+    
+
+
+
 %Renew base time    
     start_time=start_time+BASESTEP;
 end
