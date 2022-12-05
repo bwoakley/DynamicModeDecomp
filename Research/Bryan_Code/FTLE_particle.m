@@ -30,7 +30,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
 %INTTIME=99*abs(deltat);
-INTTIME=3*abs(deltat);
+INTTIME=99*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -115,7 +115,7 @@ for ti=1:N_Basetime
 
     %Keep track of a circle of points near a chosen trajectory.
     caseSelectCircle = 3;   %1 = high, 2 = med, 3 = low
-    N = 1000;               %Number of angles
+    N = 500;               %Number of angles
     hh = 1/(256*10);        %Radius of initial circle
     vxHistory = zeros(N,no_of_steps+1);
     vyHistory = zeros(N,no_of_steps+1);
@@ -138,6 +138,12 @@ for ti=1:N_Basetime
     end
     v = VideoWriter('LowStretch.avi');
     open(v)
+%     vxHistoryPlot(:,1)
+%     vyHistoryPlot(:,1)
+    [VXH, VYH]=meshgrid(vxHistory(:,1),vyHistory(:,1));
+
+%     [VXHP, VYHP]=meshgrid(vxHistoryPlot(:,1),vyHistoryPlot(:,1))
+
 
     for i = 1:no_of_steps
         i;
@@ -691,23 +697,131 @@ for ti=1:N_Basetime
         %see how the nearby points evolve. Take a circle of nearby points
         %and plot the following ellipses as a movie:
 
+
+        %Take the current vxHistory and evolve it forward:
+        
+        uinterp = u1 + (t0 - (index1-1)*ft)*(u2-u1)/ft;
+        vinterp = v1 + (t0 - (index1-1)*ft)*(v2-v1)/ft;
+           
+        xm=mod(VXH,L);ym=mod(VYH,L);
+        urhs1 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs1 = interp2(xx,yy,vinterp,xm,ym,inter,0);          
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+                %urhs1 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs1 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+
+
+%*******************************************************************
+        x1 = VXH + urhs1*deltat/2;
+        y1 = VYH + vrhs1*deltat/2;
+        %min(min(x1)) %Yes, x1 does leave the set [1,2]^2 a bit. So, we should mod it back.
+        %max(max(x1))
+        t1 = t0 + deltat/2;
+        index1n = floor(t1/ft) + 1;
+        if index1n~=index1
+            index1 = index1n;
+            index2 = index1 + 1;
+            %checkload;
+        end 
+        uinterp = u1 + (t1 - (index1-1)*ft)*(u2-u1)/ft;
+        vinterp = v1 + (t1 - (index1-1)*ft)*(v2-v1)/ft;
+
+        %xm=mod(VXH,L);ym=mod(VYH,L);
+        xm=mod(x1,L);ym=mod(y1,L);   %***********xm should update to mod(x1,L)   
+        
+        urhs2 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs2 = interp2(xx,yy,vinterp,xm,ym,inter,0);
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+                %urhs2 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs2 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+ %*************************************************************
+        x2 = VXH + urhs2*deltat/2;
+        y2 = VYH + vrhs2*deltat/2;
+        t2 = t0 + deltat/2;   
+
+        %xm=mod(VXH,L);ym=mod(VYH,L);
+        xm=mod(x2,L);ym=mod(y2,L); 
+
+        urhs3 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs3 = interp2(xx,yy,vinterp,xm,ym,inter,0);   
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+                %urhs3 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs3 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+ %****************************************************************
+        x3 = VXH + urhs3*deltat;
+        y3 = VYH + vrhs3*deltat;
+        t3 = t0 + deltat;
+        index1n = floor(t3/ft) + 1;
+        if index1n~=index1
+            index1 = index1n;
+            index2 = index1 + 1;
+            %checkload;
+        end 
+        
+        uinterp = u1 + (t3 - (index1-1)*ft)*(u2-u1)/ft;
+        vinterp = v1 + (t3 - (index1-1)*ft)*(v2-v1)/ft;
+        
+        %xm=mod(VXH,L);ym=mod(VYH,L);
+        xm=mod(x3,L);ym=mod(y3,L);  
+
+        urhs4 = interp2(xx,yy,uinterp,xm,ym,inter,0);
+        vrhs4 = interp2(xx,yy,vinterp,xm,ym,inter,0); 
+            %Instead of interping on a subset xm (a 256 grid of len L/3) of xx (a 768 grid of len L), 
+            %we will interp on a finer set xm of xxcoarse (a 256 grid of len L):
+                %urhs4 = interp2(xxcoarse,yycoarse,uinterp,xm,ym,inter,0);
+                %vrhs4 = interp2(xxcoarse,yycoarse,vinterp,xm,ym,inter,0);
+ %********************************************************************   
+    
+        dx = (deltat/6)*(urhs1 + 2*urhs2 + 2*urhs3 + urhs4);
+        dy = (deltat/6)*(vrhs1 + 2*vrhs2 + 2*vrhs3 + vrhs4);
+       
+        VXH = VXH + dx;
+        VYH = VYH + dy;
+
+        %Now save the current vxHistory
+        for theta = 1:N
+            vxHistory(theta,i+1) = VXH(theta,theta);  %The appropriate x value is along the diagonal of the mesh grid.
+            vyHistory(theta,i+1) = VYH(theta,theta); 
+        end
+
+
+        %Now we have the updated vxHistory, let's convert to vxHistoryPlot
+        for theta = 1:N
+            if caseSelectCircle == 1
+                vxHistoryPlot(theta,i+1) = (1/hh)*(vxHistory(theta,i+1)-xCoordHistoryHigh(i+1));
+                vyHistoryPlot(theta,i+1) = (1/hh)*(vyHistory(theta,i+1)-yCoordHistoryHigh(i+1));
+            elseif caseSelectCircle == 2                
+                vxHistoryPlot(theta,i+1) = (1/hh)*(vxHistory(theta,i+1)-xCoordHistoryMed(i+1));
+                vyHistoryPlot(theta,i+1) = (1/hh)*(vyHistory(theta,i+1)-yCoordHistoryMed(i+1));
+            else                
+                vxHistoryPlot(theta,i+1) = (1/hh)*(vxHistory(theta,i+1)-xCoordHistoryLow(i+1));
+                vyHistoryPlot(theta,i+1) = (1/hh)*(vyHistory(theta,i+1)-yCoordHistoryLow(i+1));
+            end
+        end
+
+
         %First plot initial circle in red
         scatter(vxHistoryPlot(:,1),vyHistoryPlot(:,1),2,'filled','r') 
         xlim([-1.5 1.5])
         ylim([-1.5 1.5])
         pbaspect([1 1 1])
         %Then plot the current ellipse.
-%         hold on;
-% 
-% 
-%         hold off;
+        hold on;
+        scatter(vxHistoryPlot(:,i+1),vyHistoryPlot(:,i+1),2,'filled','b') 
+
+
+        hold off;
 
         frame = getframe(gcf);
         writeVideo(v,frame);
     end
 
-    
+    close(v)
 
+    
     dle_2d;
     
     FTLEHigh = dle(rowIndexHigh,colIndexHigh);
