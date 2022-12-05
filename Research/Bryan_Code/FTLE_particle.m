@@ -30,7 +30,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
 %INTTIME=99*abs(deltat);
-INTTIME=99*abs(deltat);
+INTTIME=1*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -114,7 +114,7 @@ for ti=1:N_Basetime
     FTLENetHistoryLow = zeros(1,no_of_steps);
 
     %Keep track of a circle of points near a chosen trajectory.
-    caseSelectCircle = 1;   %1 = high, 2 = med, 3 = low
+    caseSelectCircle = 3;   %1 = high, 2 = med, 3 = low
     N = 500;               %Number of angles
     hh = 1/(256*10);        %Radius of initial circle
     vxHistory = zeros(N,no_of_steps+1);
@@ -136,13 +136,19 @@ for ti=1:N_Basetime
             vyHistory(theta,1) = hh*vyHistoryPlot(theta,1)+yCoordHistoryLow(1);
         end
     end
-    v = VideoWriter('HighStretch.avi');
+    v = VideoWriter('temp.avi');
     open(v)
-%     vxHistoryPlot(:,1)
-%     vyHistoryPlot(:,1)
+
     [VXH, VYH]=meshgrid(vxHistory(:,1),vyHistory(:,1));
 
-%     [VXHP, VYHP]=meshgrid(vxHistoryPlot(:,1),vyHistoryPlot(:,1))
+    %Keep track of the singular directions of grad u:
+    xSingDirHistoryHigh = zeros(1,no_of_steps);
+    ySingDirHistoryHigh = zeros(1,no_of_steps);
+    xSingDirHistoryMed = zeros(1,no_of_steps);
+    ySingDirHistoryMed = zeros(1,no_of_steps);
+    xSingDirHistoryLow = zeros(1,no_of_steps);
+    ySingDirHistoryLow = zeros(1,no_of_steps);
+    
 
 
     for i = 1:no_of_steps
@@ -609,6 +615,12 @@ for ti=1:N_Basetime
                 FTLEHistoryLowPoints(i) = dle;
             end
     
+
+
+
+
+
+
             
             %We want to compare this FTLE 4 particle to Strain 4 particle:
 
@@ -683,6 +695,26 @@ for ti=1:N_Basetime
             else
                 StrainHistoryLow(i) = strain;
             end
+
+
+             %Now compute the singular directions of A = grad u to find the
+             %directions of largest stretching:
+    
+             [U,S,V] = svd(A);
+
+            if caseSelect == 1
+                xSingDirHistoryHigh(i) = U(1,1);
+                ySingDirHistoryHigh(i) = U(2,1);
+            elseif caseSelect == 2
+                xSingDirHistoryMed(i) = U(1,1);
+                ySingDirHistoryMed(i) = U(2,1);
+            else
+                xSingDirHistoryLow(i) = U(1,1);
+                ySingDirHistoryLow(i) = U(2,1);
+            end
+
+
+
 
         end
 
@@ -819,6 +851,9 @@ for ti=1:N_Basetime
 
         frame = getframe(gcf);
         writeVideo(v,frame);
+
+
+
     end
 
     close(v)
