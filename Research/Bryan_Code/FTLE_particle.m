@@ -114,7 +114,7 @@ for ti=1:N_Basetime
     FTLENetHistoryLow = zeros(1,no_of_steps);
 
     %Keep track of a circle of points near a chosen trajectory.
-    caseSelectCircle = 3;   %1 = high, 2 = med, 3 = low
+    caseSelectCircle = 1;   %1 = high, 2 = med, 3 = low
     N = 500;               %Number of angles
     hh = 1/(256*10);        %Radius of initial circle
     vxHistory = zeros(N,no_of_steps+1);
@@ -136,7 +136,7 @@ for ti=1:N_Basetime
             vyHistory(theta,1) = hh*vyHistoryPlot(theta,1)+yCoordHistoryLow(1);
         end
     end
-    v = VideoWriter('LowStretch.avi');
+    v = VideoWriter('HighStretch.avi');
     open(v)
 %     vxHistoryPlot(:,1)
 %     vyHistoryPlot(:,1)
@@ -805,6 +805,8 @@ for ti=1:N_Basetime
 
         %First plot initial circle in red
         scatter(vxHistoryPlot(:,1),vyHistoryPlot(:,1),2,'filled','r') 
+        title('t =', (i+1)*deltat)
+
         xlim([-1.5 1.5])
         ylim([-1.5 1.5])
         pbaspect([1 1 1])
