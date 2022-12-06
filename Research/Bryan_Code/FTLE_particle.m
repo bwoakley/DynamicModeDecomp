@@ -837,7 +837,7 @@ for ti=1:N_Basetime
 
         %First plot initial circle in red
         scatter(vxHistoryPlot(:,1),vyHistoryPlot(:,1),2,'filled','r') 
-        title('t =', (i+1)*deltat)
+        title('t =', (i)*deltat)
 
         xlim([-1.5 1.5])
         ylim([-1.5 1.5])
@@ -846,7 +846,19 @@ for ti=1:N_Basetime
         hold on;
         scatter(vxHistoryPlot(:,i+1),vyHistoryPlot(:,i+1),2,'filled','b') 
 
-
+        hold on;
+        
+        if caseSelectCircle == 1
+            temp = [xSingDirHistoryHigh(i); ySingDirHistoryHigh(i)];
+            plotv(temp,'-k')
+        elseif caseSelectCircle == 2                
+            temp = [xSingDirHistoryMed(i); ySingDirHistoryMed(i)];
+            plotv(temp,'-k')
+        else                
+            temp = [xSingDirHistoryLow(i); ySingDirHistoryLow(i)];
+            plotv(temp,'-k')
+        end
+        
         hold off;
 
         frame = getframe(gcf);
