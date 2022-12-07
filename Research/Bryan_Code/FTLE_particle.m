@@ -30,7 +30,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
 %INTTIME=99*abs(deltat);
-INTTIME=1*abs(deltat);
+INTTIME=99*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -113,10 +113,14 @@ for ti=1:N_Basetime
     FTLENetHistoryMed = zeros(1,no_of_steps);
     FTLENetHistoryLow = zeros(1,no_of_steps);
 
+
+     %Consider 4 points close to my trajectory.
+     h = 1/(256*10);
+
     %Keep track of a circle of points near a chosen trajectory.
     caseSelectCircle = 3;   %1 = high, 2 = med, 3 = low
     N = 500;               %Number of angles
-    hh = 1/(256*10);        %Radius of initial circle
+    hh = h;        %Radius of initial circle
     vxHistory = zeros(N,no_of_steps+1);
     vyHistory = zeros(N,no_of_steps+1);
     vxHistoryPlot = zeros(N,no_of_steps+1);
@@ -141,7 +145,7 @@ for ti=1:N_Basetime
 
     [VXH, VYH]=meshgrid(vxHistory(:,1),vyHistory(:,1));
 
-    %Keep track of the singular directions of grad u:
+    %Keep track of the singular directions of grad flow^T:
     xSingDirHistoryHigh = zeros(1,no_of_steps);
     ySingDirHistoryHigh = zeros(1,no_of_steps);
     xSingDirHistoryMed = zeros(1,no_of_steps);
@@ -149,7 +153,21 @@ for ti=1:N_Basetime
     xSingDirHistoryLow = zeros(1,no_of_steps);
     ySingDirHistoryLow = zeros(1,no_of_steps);
     
-
+    %Keep track of the singular directions of the displacement grad X^T = G = F:
+    xSingDirDispHistoryHigh = zeros(1,no_of_steps);
+    ySingDirDispHistoryHigh = zeros(1,no_of_steps);
+    xSingDirDispHistoryMed = zeros(1,no_of_steps);
+    ySingDirDispHistoryMed = zeros(1,no_of_steps);
+    xSingDirDispHistoryLow = zeros(1,no_of_steps);
+    ySingDirDispHistoryLow = zeros(1,no_of_steps);
+    
+    %Keep track of the angle of the singular vectors.
+    angleSingHigh = zeros(1,no_of_steps);
+    angleSingDispHigh = zeros(1,no_of_steps);
+    angleSingMed = zeros(1,no_of_steps);
+    angleSingDispMed = zeros(1,no_of_steps);
+    angleSingLow = zeros(1,no_of_steps);
+    angleSingDispLow = zeros(1,no_of_steps);
 
     for i = 1:no_of_steps
         i;
@@ -467,8 +485,7 @@ for ti=1:N_Basetime
 
 
         %This time, compute the FTLE at every time step a different way.
-        %Consider 4 points close to my trajectory.
-        h = 1/(256*30);
+       
         %Select High, Med, Low
         for caseSelect = 1:3
             if caseSelect == 1
@@ -606,6 +623,7 @@ for ti=1:N_Basetime
             dle=log(lam)/(2*deltat);   %Use this for incremental diff
 
 
+
             %Now save the dle history
             if caseSelect == 1
                 FTLEHistoryHighPoints(i) = dle;
@@ -617,9 +635,25 @@ for ti=1:N_Basetime
     
 
 
+            %Keep track of the singular directions of the displacement G =
+            %F = \nabla X^T
+            G = [G11, G12; G21, G22];
 
+            [GU,GS,GV] = svd(G);
 
-
+            if caseSelect == 1
+                xSingDirDispHistoryHigh(i) = GU(1,1);
+                ySingDirDispHistoryHigh(i) = GU(2,1);
+                angleSingDispHigh(i) = atan(GU(2,1)/GU(1,1));
+            elseif caseSelect == 2
+                xSingDirDispHistoryMed(i) = GU(1,1);
+                ySingDirDispHistoryMed(i) = GU(2,1);
+                angleSingDispMed(i) = atan(GU(2,1)/GU(1,1));
+            else
+                xSingDirDispHistoryLow(i) = GU(1,1);
+                ySingDirDispHistoryLow(i) = GU(2,1);
+                angleSingDispLow(i) = atan(GU(2,1)/GU(1,1));
+            end
 
             
             %We want to compare this FTLE 4 particle to Strain 4 particle:
@@ -705,12 +739,16 @@ for ti=1:N_Basetime
             if caseSelect == 1
                 xSingDirHistoryHigh(i) = U(1,1);
                 ySingDirHistoryHigh(i) = U(2,1);
+                angleSingHigh(i) = atan(U(2,1)/U(1,1));
+
             elseif caseSelect == 2
                 xSingDirHistoryMed(i) = U(1,1);
                 ySingDirHistoryMed(i) = U(2,1);
+                angleSingMed(i) = atan(U(2,1)/U(1,1));
             else
                 xSingDirHistoryLow(i) = U(1,1);
                 ySingDirHistoryLow(i) = U(2,1);
+                angleSingLow(i) = atan(U(2,1)/U(1,1));
             end
 
 
@@ -851,12 +889,27 @@ for ti=1:N_Basetime
         if caseSelectCircle == 1
             temp = [xSingDirHistoryHigh(i); ySingDirHistoryHigh(i)];
             plotv(temp,'-k')
+            plotv(-temp,'-k')
+
+            tempDisp = [xSingDirDispHistoryHigh(i); ySingDirDispHistoryHigh(i)];
+            plotv(tempDisp,'-r')
+            plotv(-tempDisp,'-r')
         elseif caseSelectCircle == 2                
             temp = [xSingDirHistoryMed(i); ySingDirHistoryMed(i)];
             plotv(temp,'-k')
+            plotv(-temp,'-k')  
+
+            tempDisp = [xSingDirDispHistoryMed(i); ySingDirDispHistoryMed(i)];
+            plotv(tempDisp,'-r')
+            plotv(-tempDisp,'-r')          
         else                
             temp = [xSingDirHistoryLow(i); ySingDirHistoryLow(i)];
             plotv(temp,'-k')
+            plotv(-temp,'-k')
+
+            tempDisp = [xSingDirDispHistoryLow(i); ySingDirDispHistoryLow(i)];
+            plotv(tempDisp,'-r')
+            plotv(-tempDisp,'-r')
         end
         
         hold off;
@@ -941,10 +994,30 @@ for ti=1:N_Basetime
     title('FTLE Low')
 
     
+    figure;
+    subplot(3,1,1)
+    plot(angleSingHigh)
+    hold on;
+    plot(angleSingDispHigh)
+    hold off;
+    legend('angleSingLow','angleSingDispLow')
+    title('Angle of singular direction: High')
 
-    
+    subplot(3,1,2)
+    plot(angleSingMed)
+    hold on;
+    plot(angleSingDispMed)
+    hold off;
+    legend('angleSingLow','angleSingDispLow')
+    title('Angle of singular direction: Med')
 
-
+    subplot(3,1,3)
+    plot(angleSingLow)
+    hold on;
+    plot(angleSingDispLow)
+    hold off;
+    legend('angleSingLow','angleSingDispLow')
+    title('Angle of singular direction: Low')
 
 %Renew base time    
     start_time=start_time+BASESTEP;
