@@ -30,7 +30,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
 %INTTIME=99*abs(deltat);
-INTTIME=99*abs(deltat);
+INTTIME=10*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -202,8 +202,8 @@ for ti=1:N_Basetime
 %             v1 = v1temp;
 %         end
 
-%         u1 = -(XST-1.5);
-%         v1 = YST-1.5;
+        u1 = -2*(XST-1.5);
+        v1 = YST-1.5;
 
 %         figure;
 %         quiver(u1,v1)
@@ -231,8 +231,8 @@ for ti=1:N_Basetime
         u2 = data(:,:,1)' ;
         v2 = data(:,:,2)' ;
 
-%         u2 = -(XST-1.5);
-%         v2 = YST-1.5;
+        u2 = -2*(XST-1.5);
+        v2 = YST-1.5;
         
 %         u2 = u1temp;
 %         v2 = v1temp;
@@ -1000,7 +1000,7 @@ for ti=1:N_Basetime
     hold on;
     plot(angleSingDispHigh)
     hold off;
-    legend('angleSingLow','angleSingDispLow')
+    legend('angleSingHigh','angleSingDispHigh')
     title('Angle of singular direction: High')
 
     subplot(3,1,2)
@@ -1008,7 +1008,7 @@ for ti=1:N_Basetime
     hold on;
     plot(angleSingDispMed)
     hold off;
-    legend('angleSingLow','angleSingDispLow')
+    legend('angleSingMed','angleSingDispMed')
     title('Angle of singular direction: Med')
 
     subplot(3,1,3)
@@ -1018,6 +1018,28 @@ for ti=1:N_Basetime
     hold off;
     legend('angleSingLow','angleSingDispLow')
     title('Angle of singular direction: Low')
+
+
+
+
+%     figure;
+%     subplot(3,1,1)
+%     plot(mod(abs(angleSingHigh-angleSingDispHigh),pi/2))
+%     legend('DiffAngleSingHigh')
+%     title('Diff Angle: High')
+% 
+%     subplot(3,1,2)
+%     plot(mod(abs(angleSingMed-angleSingDispMed),pi/2))
+%     legend('DiffAngleSingMed')
+%     title('Diff Angle: Med')
+% 
+%     subplot(3,1,3)
+%     plot(mod(abs(angleSingLow-angleSingDispLow),pi/2))
+%     legend('DiffAngleSingLow')
+%     title('Diff Angle: Low')
+
+
+
 
 %Renew base time    
     start_time=start_time+BASESTEP;
