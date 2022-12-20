@@ -30,7 +30,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
 %INTTIME=99*abs(deltat);
-INTTIME=10*abs(deltat);
+INTTIME=1*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -202,8 +202,8 @@ for ti=1:N_Basetime
 %             v1 = v1temp;
 %         end
 
-        u1 = -2*(XST-1.5);
-        v1 = YST-1.5;
+%         u1 = -1*(XST-1.5);
+%         v1 = YST-1.5;
 
 %         figure;
 %         quiver(u1,v1)
@@ -231,9 +231,9 @@ for ti=1:N_Basetime
         u2 = data(:,:,1)' ;
         v2 = data(:,:,2)' ;
 
-        u2 = -2*(XST-1.5);
-        v2 = YST-1.5;
-        
+%         u2 = -1*(XST-1.5);
+%         v2 = YST-1.5;
+%         
 %         u2 = u1temp;
 %         v2 = v1temp;
 %         errorFlow =  max( max ( abs(u1temp - u2) + abs(v1temp - v2)));
@@ -639,6 +639,8 @@ for ti=1:N_Basetime
             %F = \nabla X^T
             G = [G11, G12; G21, G22];
 
+            %G = G';
+
             [GU,GS,GV] = svd(G);
 
             if caseSelect == 1
@@ -712,6 +714,8 @@ for ti=1:N_Basetime
 
 
             A = [A11, A12; A21, A22];
+            
+%             A = A';
 
             ASym = .5*(A + A');
 
