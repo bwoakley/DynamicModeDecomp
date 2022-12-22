@@ -30,7 +30,7 @@ deltat = dir*timestepsize; %%integration step size with direction
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
 %INTTIME=99*abs(deltat);
-INTTIME=1*abs(deltat);
+INTTIME=10*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -205,6 +205,9 @@ for ti=1:N_Basetime
 %         u1 = -1*(XST-1.5);
 %         v1 = YST-1.5;
 
+          u1 = 10*(YST-1.5);
+          v1 = 0*XST;
+
 %         figure;
 %         quiver(u1,v1)
 
@@ -233,6 +236,11 @@ for ti=1:N_Basetime
 
 %         u2 = -1*(XST-1.5);
 %         v2 = YST-1.5;
+
+
+          u2 = 10*(YST-1.5);
+          v2 = 0*XST;
+
 %         
 %         u2 = u1temp;
 %         v2 = v1temp;
