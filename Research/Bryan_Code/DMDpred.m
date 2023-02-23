@@ -65,7 +65,7 @@ end
 X1 = stateVecs(:,1:N-1);
 X2 = stateVecs(:,2:N);
 
-[Phi ,omega ,lambda ,b,Xdmd, S] = DMD(X1,X2,r,dt);
+[Phi ,omega ,lambda ,b,Xdmd, S, uMax] = DMD(X1,X2,r,dt);
 D = diag(lambda);
 
 
@@ -90,7 +90,7 @@ for i = 1:pred+1
 
 end
 
-error = error/rows;     %Normalize it
+error = error/(rows*uMax);     %Normalize it
 error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
 % figure;
 % plot(error,'o-')

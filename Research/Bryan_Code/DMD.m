@@ -1,4 +1,4 @@
-function [Phi ,omega ,lambda ,b,Xdmd,S] = DMD(X1,X2,r,dt)
+function [Phi ,omega ,lambda ,b,Xdmd,S,uMax] = DMD(X1,X2,r,dt)
 
 %% This code is borrowed from KutzBrunton2016 book.
 
@@ -41,7 +41,7 @@ time_dynamics (:,iter )=(b.*exp(omega*t(iter )));
 end;
 Xdmd = Phi * time_dynamics ;
 
-
+uMax = max(abs(X1(:,1)));
 
 
 
