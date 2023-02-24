@@ -44,29 +44,27 @@ if false
 end
 
 
-%Activate block to plot singular values and eigenvalues
-if true
-    
-    r = 9;   %How many modes to use
-    figure;
-        
-    [error, lambda,S] = DMDpred(pred,N,r);
-    plot(error)
-    title('error')
-    
-    figure;
-    plot(real(lambda),'*-')
-    hold on; 
-    plot(imag(lambda),'o-')
-    hold off;
-    title('Real and imaginary parts of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
-    legend('Real part','Imaginary part')
-    
-    figure;
-    plot(diag(S))
-    title('Singular values of $X_1$','interpreter','latex')
 
-end
+r = 5;   %How many modes to use
+figure;
+    
+[error, lambda,S] = DMDpred(pred,N,r);
+plot(error)
+title('error')
+
+figure;
+plot(real(lambda),'*-')
+hold on; 
+plot(imag(lambda),'o-')
+hold off;
+title('Real and ima part of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
+legend('Real part','Imaginary part')
+
+figure;
+plot(diag(S))
+title('Singular values of $X_1$','interpreter','latex')
+
+
 
 
 
