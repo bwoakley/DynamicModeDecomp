@@ -181,7 +181,7 @@ for ti=1:N_Basetime
 
 
         %data file name
-        ss='Turb';
+        ss='Line';
 
         ii = i + 1000;
         st=strcat('../Cases/',ss,'/bin0',num2str(ii));

@@ -11,12 +11,12 @@ if N+pred>100
 end
 
 
-%Activate block to plot error for various r
+%%Activate block to plot error for various r
 %Here I used:
 % pred = 90;                   
 % N = 10; 
 if false
-    
+    fl
     figure;
     rVec = [1,2,3,4,5,6,7,8,9]; %Max r to take is N-1
     
@@ -44,13 +44,16 @@ if false
 end
 
 
-%Activate block to plot singular values and eigenvalues
+%%Activate block to plot singular values and eigenvalues
 %Here I used:
 %N = 10
 %r = 5, 6, or 9
 if false
 
-    r = 9;   %How many modes to use
+    %N = 10;
+    %pred = 100-N;
+    r=5;
+    %r = N-1;   %How many modes to use
     figure;
         
     [error, lambda,S] = DMDpred(pred,N,r);
@@ -72,38 +75,58 @@ if false
 end
 
 
-%Now fix r and vary N.
-
-r = 5;   %How many modes to use
-
-figure;
-nVec = [10,20,30]; %Max pred to take is 100-N
-
-for N = nVec
+%%Now fix r and vary N.
+if false
+    r = 5;   %How many modes to use
     
-    [error, lambda, S] = DMDpred(pred,N,r);
-    plot(error)
-    hold on;
+    figure;
+    nVec = [10,20,30,40,50]; %Max pred to take is 100-N
     
+    for N = nVec
+    
+        pred = 100-N;
+    
+        [error, lambda, S] = DMDpred(pred,N,r);
+        plot(error)
+        hold on;
+        
+    end
+    
+    hold off;
+    legend('N=10','N=20','N=30','N=40','N=50')
+    title('Error for different N, given r = 5.')
+    xlabel('Number of time steps predicted')
+    ylabel('Error')
 end
 
-figure;
-    
-[error, lambda,S] = DMDpred(pred,N,r);
-plot(error)
-title('error')
 
-figure;
-plot(real(lambda),'*-')
-hold on; 
-plot(imag(lambda),'o-')
-hold off;
-title('Real and imaginary parts of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
-legend('Real part','Imaginary part')
+%%Now try linear flow.
+% ss='Line';
+% kk = 256;
+% 
+% i=1;
+% 
+% ii = i + 1000;
+% st=strcat('../Cases/',ss,'/bin0',num2str(ii));
+% fid=fopen(st,'rb');
+% data=fread(fid,[1 1],'*float');
+% data=fread(fid,[1 inf],'*double');
+% fclose(fid);
+% data=reshape(data,kk,kk,3);
+% u1 = data(:,:,1)' ;
+% v1 = data(:,:,2)' ;
+% 
+% figure;
+% quiver(u1,v1)
 
-figure;
-plot(diag(S))
-title('Singular values of $X_1$','interpreter','latex')
 
-
-
+%Length of domain
+L = 3;
+x=linspace(0,L,256*3+1); 
+y=linspace(0,L,256*3+1);
+xa=x(257:512);ya=y(257:512);
+[XST, YST]=meshgrid(xa,ya);
+u1 = -1*(XST-1.5);
+v1 = YST-1.5;
+% figure;
+% quiver(u1,v1)

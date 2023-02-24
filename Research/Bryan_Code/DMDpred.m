@@ -1,4 +1,4 @@
-function [error,lambda, S] = DMDpred(pred,N,r)
+function [error,lambda, S] = DMDpred(pred,N,r,flowCase )
 %%This function will return the predictions for various choices of 
 % N,pred, and r
 
@@ -37,19 +37,20 @@ stateVecs = zeros(rows,no_of_steps);
 
 for i = 1:no_of_steps
 
-        %data file name
-        ss='Turb';
-
-        ii = i + 1000;
-        st=strcat('../Cases/',ss,'/bin0',num2str(ii));
-        fid=fopen(st,'rb');
-        data=fread(fid,[1 1],'*float');
-        data=fread(fid,[1 inf],'*double');
-        fclose(fid);
-        data=reshape(data,kk,kk,3);
-        u1 = data(:,:,1)' ;
-        v1 = data(:,:,2)' ;
-
+        if flowCase == 1   %then choose 'turb' flow
+            %data file name
+            ss='Turb';
+    
+            ii = i + 1000;
+            st=strcat('../Cases/',ss,'/bin0',num2str(ii));
+            fid=fopen(st,'rb');
+            data=fread(fid,[1 1],'*float');
+            data=fread(fid,[1 inf],'*double');
+            fclose(fid);
+            data=reshape(data,kk,kk,3);
+            u1 = data(:,:,1)' ;
+            v1 = data(:,:,2)' ;
+        end
 %         figure;
 %         quiver(u1,v1)
 
