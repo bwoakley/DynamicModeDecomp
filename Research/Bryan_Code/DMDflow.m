@@ -103,24 +103,6 @@ if true
 end
 
 
-%%Now try linear flow.
-% ss='Line';
-% kk = 256;
-% 
-% i=1;
-% 
-% ii = i + 1000;
-% st=strcat('../Cases/',ss,'/bin0',num2str(ii));
-% fid=fopen(st,'rb');
-% data=fread(fid,[1 1],'*float');
-% data=fread(fid,[1 inf],'*double');
-% fclose(fid);
-% data=reshape(data,kk,kk,3);
-% u1 = data(:,:,1)' ;
-% v1 = data(:,:,2)' ;
-% 
-% figure;
-% quiver(u1,v1)
 
 
 %Length of domain
