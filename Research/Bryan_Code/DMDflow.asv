@@ -22,7 +22,7 @@ if false
     
     for r = rVec
         
-        [error, lambda] = DMDpred(pred,N,r);
+        [error, lambda, S] = DMDpred(pred,N,r);
         plot(error)
         hold on;
         
@@ -44,8 +44,49 @@ if false
 end
 
 
+%Activate block to plot singular values and eigenvalues
+%Here I used:
+%N = 10
+%r = 5, 6, or 9
+if false
+
+    r = 9;   %How many modes to use
+    figure;
+        
+    [error, lambda,S] = DMDpred(pred,N,r);
+    plot(error)
+    title('error')
+    
+    figure;
+    plot(real(lambda),'*-')
+    hold on; 
+    plot(imag(lambda),'o-')
+    hold off;
+    title('Real and imaginary parts of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
+    legend('Real part','Imaginary part')
+    
+    figure;
+    plot(diag(S))
+    title('Singular values of $X_1$','interpreter','latex')
+
+end
+
+
+%Now fix r and vary N.
 
 r = 5;   %How many modes to use
+
+figure;
+nVec = [10,20,30]; %Max pred to take is 100-N
+
+for N = nVec
+    
+    [error, lambda, S] = DMDpred(pred,N,r);
+    plot(error)
+    hold on;
+    
+end
+
 figure;
     
 [error, lambda,S] = DMDpred(pred,N,r);
@@ -57,17 +98,12 @@ plot(real(lambda),'*-')
 hold on; 
 plot(imag(lambda),'o-')
 hold off;
-title('Real and ima part of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
+title('Real and imaginary parts of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
 legend('Real part','Imaginary part')
 
 figure;
 plot(diag(S))
 title('Singular values of $X_1$','interpreter','latex')
-
-
-
-
-
 
 
 
