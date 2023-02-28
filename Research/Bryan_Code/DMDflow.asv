@@ -10,10 +10,9 @@ if N+pred>100
     disp('Need more data')
 end
 
-flowCase = 3;   %flowCase decides what flow to use. 
+flowCase = 2;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
                 % flowCase = 2 means Linear flow
-                % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
 
 r = 1;
 
@@ -54,14 +53,14 @@ end
 %Here I used:
 %N = 10
 %r = 5, 6, or 9
-if true
+if false
 
     %r=9;
 
-    figure;
-    [error, lambda,S] = DMDpred(pred,N,r,flowCase);
-    plot(error)
-    title('error')
+%     figure;
+%     [error, lambda,S] = DMDpred(pred,N,r,flowCase);
+%     plot(error)
+%     title('error')
     
     figure;
     plot(real(lambda),'*-')
