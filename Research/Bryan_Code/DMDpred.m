@@ -31,7 +31,7 @@ function [error,lambda, S] = DMDpred(pred,N,r,flowCase )
 no_of_steps = N + pred;     %Total number of velocity data to aquire (also get data past N to compare to our predictions).
 dt = .02;                   %time step size
 
-kk = 3;
+kk = 256;
 rows = (kk^2)*2;
 stateVecs = zeros(rows,no_of_steps);
 
@@ -85,7 +85,7 @@ for i = 1:no_of_steps
 end
 
 
-X1 = stateVecs(:,1:N-1)
+X1 = stateVecs(:,1:N-1);
 X2 = stateVecs(:,2:N);
 
 [Phi ,omega ,lambda ,b,Xdmd, S, uMax] = DMD(X1,X2,r,dt);

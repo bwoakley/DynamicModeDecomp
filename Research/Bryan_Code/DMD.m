@@ -19,7 +19,7 @@ function [Phi ,omega ,lambda ,b,Xdmd,S,uMax] = DMD(X1,X2,r,dt)
 % b, a vector of magnitudes of modes Phi
 % Xdmd, the data matrix reconstructed by Phi , omega , b
 %% DMD
-[W, S, V] = svd(X1, 'econ')
+[W, S, V] = svd(X1, 'econ');
 r = min(r, size(W,2));
 W_r = W(:, 1:r); % truncate to rank-r
 S_r = S(1:r, 1:r);
