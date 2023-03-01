@@ -3,21 +3,26 @@ close all;
 clc;
 format long;
 
+kk = 256;                    %Grid is kk by kk
+rows = (kk^2)*2;             %Number of rows in the snapshots
 
-pred = 90;                   %pred = number of time steps forward to predict.
+r = 6;                       %Truncate to r singular values
+
 N = 10;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+pred = 90;                   %pred = number of time steps forward to predict.
 if N+pred>100
     disp('Need more data')
 end
 
-flowCase = 3;   %flowCase decides what flow to use. 
+flowCase = 1;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
-                % flowCase = 2 means Linear flow
+                % flowCase = 2 means Linear flow (-x,y)
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
 
-r = 1;
+[ Xpred, Xdmd, stateVecs, lambda, S ] = DMDpred( pred, N, r, flowCase, kk );
 
-%%Activate block to plot error for various r
+
+%% Activate block to plot error for various r
 %Here I used:
 % pred = 90;                   
 % N = 10; 
@@ -50,19 +55,65 @@ if false
 end
 
 
-%%Activate block to plot singular values and eigenvalues
-%Here I used:
+%% Activate block to:
+% Plot error and
+% plot singular values and eigenvalues
+%Consider :
 %N = 10
 %r = 5, 6, or 9
-if true
+if false
+    
+    %Now analize the error at each time step
+    error = zeros(1,pred);
+    %errorC = zeros(1,pred);
+    
+    for i = 1:pred+1
+    
+        temp = Xpred(:,i) - stateVecs(:,N-1+i) ;
+        error(i) = sumabs(real(temp));
+        %errorC(i) = sumabs(imag(temp));
+    
+    end
 
-    %r=9;
+    uMax = max(abs(stateVecs(:,1)));
+    
+    error = error/(rows*uMax);     %Normalize it
+    error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
+    
+    % figure;
+    % plot(error,'o-')
+    % hold on;
+    % plot(errorC,'*-')
+    % hold off;
+        
+    %Now analize the error at each time step, for Xdmd prediction
+    error2 = zeros(1,pred);
+    % errorC = zeros(1,pred);
+    
+    for i = 1:pred
+    
+        temp = Xdmd(:,i) - stateVecs(:,N+i) ; %Xdmd(1) ~ stateVec(N+1)
+        error2(i) = sumabs(real(temp));
+    %     errorC(i) = sumabs(imag(temp));
+    
+    end
+    
+    error2 = error2/(rows*uMax);     %Normalize it
+       
+    % figure;
+    % plot(error2,'o-')
+    % hold on;
+    % plot(errorC,'*-')
+    % hold off;
 
     figure;
-    [error, lambda,S] = DMDpred(pred,N,r,flowCase);
     plot(error)
     title('error')
-    
+
+    figure;
+    plot(error2)
+    title('error2')
+
     figure;
     plot(real(lambda),'*-')
     hold on; 
@@ -78,7 +129,7 @@ if true
 end
 
 
-%%Now fix r and vary N.
+%% Now fix r and vary N.
 if false
 
     flowCase = 1; %flowCase decides what flow to use. flowCase = 1 means 'turb'
@@ -105,6 +156,16 @@ if false
 end
 
 
+%% Plot the predicted flow
+if true
+
+
+
+
+
+
+
+end
 
 
 

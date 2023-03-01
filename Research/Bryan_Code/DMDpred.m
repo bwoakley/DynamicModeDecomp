@@ -1,4 +1,4 @@
-function [error,lambda, S] = DMDpred(pred,N,r,flowCase )
+function [Xpred, Xdmd, stateVecs, lambda, S] = DMDpred(pred,N,r,flowCase,kk )
 %%This function will return the predictions for various choices of 
 % N,pred, and r
 
@@ -31,7 +31,6 @@ function [error,lambda, S] = DMDpred(pred,N,r,flowCase )
 no_of_steps = N + pred;     %Total number of velocity data to aquire (also get data past N to compare to our predictions).
 dt = .02;                   %time step size
 
-kk = 256;
 rows = (kk^2)*2;
 stateVecs = zeros(rows,no_of_steps);
 
@@ -88,7 +87,7 @@ end
 X1 = stateVecs(:,1:N-1);
 X2 = stateVecs(:,2:N);
 
-[Phi ,omega ,lambda ,b,Xdmd, S, uMax] = DMD(X1,X2,r,dt);
+[Phi, lambda, b, Xdmd, S] = DMD(X1,X2,pred,N,r,dt);
 D = diag(lambda);
 
 
@@ -99,27 +98,6 @@ for i = 1:pred
     pseudo = Phi\current;
     Xpred(:,i+1) = Phi * D * pseudo;
 end
-
-
-    %Now analize the error at each time step
-error = zeros(1,pred);
-%errorC = zeros(1,pred);
-
-for i = 1:pred+1
-
-    temp = Xpred(:,i) - stateVecs(:,N-1+i) ;
-    error(i) = sumabs(real(temp));
-    %errorC(i) = sumabs(imag(temp));
-
-end
-
-error = error/(rows*uMax);     %Normalize it
-error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
-% figure;
-% plot(error,'o-')
-% hold on;
-% plot(errorC,'*-')
-% hold off;
 
 
 

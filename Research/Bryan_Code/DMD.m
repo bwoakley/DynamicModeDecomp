@@ -1,4 +1,4 @@
-function [Phi ,omega ,lambda ,b,Xdmd,S,uMax] = DMD(X1,X2,r,dt)
+function [Phi, lambda, b, Xdmd, S] = DMD(X1,X2,pred,N,r,dt)
 
 %% This code is borrowed from KutzBrunton2016 book.
 
@@ -24,25 +24,37 @@ r = min(r, size(W,2));
 W_r = W(:, 1:r); % truncate to rank-r
 S_r = S(1:r, 1:r);
 V_r = V(:, 1:r);
-Atilde = W_r.' * X2 * V_r / S_r; % low -rank dynamics
+Atilde = W_r' * X2 * V_r / S_r; % low -rank dynamics
 
 [Z_r , D] = eig(Atilde);
 Phi = X2 * V_r / S_r * Z_r; % DMD modes
 lambda = diag(D); % discrete -time eigenvalues
-omega = log(lambda)/dt; % continuous-time eigenvalues
-%% Compute DMD mode amplitudes b
-x1 = X1(:, 1);
-b = Phi\x1;
-%% DMD reconstruction
-mm1 = size(X1, 2); % mm1 = m - 1
-time_dynamics = zeros(r, mm1);
-t = (0:mm1 -1)*dt; % time vector
-for iter = 1:mm1 ,
-time_dynamics (:,iter )=(b.*exp(omega*t(iter )));
-end;
-Xdmd = Phi * time_dynamics ;
 
-uMax = max(abs(X1(:,1)));
+%omega = log(lambda)/dt; % continuous-time eigenvalues
+
+% Compute DMD mode amplitudes b
+%x1 = X1(:, end);
+%b = Phi\x1;
+% DMD reconstruction
+%mm1 = size(X1, 2); % mm1 = m - 1
+%time_dynamics = zeros(r, mm1);
+%t = (0:mm1 -1)*dt; % time vector
+%for iter = 1:mm1 ,
+%time_dynamics (:,iter )=(b.*exp(omega*t(iter )));
+%end;
+%Xdmd = Phi * time_dynamics ;
+
+%% Reconstructing DMD
+Nf=pred;%number of time steps forward 
+x1=X2(:,end);%Take the last snap shot from X2
+b=Phi\x1;%Obtain initial condition from last snapshot
+temporal=zeros(r,Nf);
+for i=1:Nf
+    temporal(:,i)=b.*lambda.^i;%Raise by eigenvalue to power of timestep
+end
+Xdmd=Phi*temporal;
+
+
 
 
 
