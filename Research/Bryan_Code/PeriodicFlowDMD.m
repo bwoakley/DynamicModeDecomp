@@ -177,12 +177,12 @@ title('DMD mode 2','fontsize',18)
 % end
 
 %%  Plot DMD spectrum
-% figure
-% theta = (0:1:100)*2*pi/100;
-% plot(cos(theta),sin(theta),'k--') % plot unit circle
-% hold on, grid on
-% scatter(real(diag(eigs)),imag(diag(eigs)),'ok')
-% axis([-1.1 1.1 -1.1 1.1]);
+figure
+theta = (0:1:100)*2*pi/100;
+plot(cos(theta),sin(theta),'k--') % plot unit circle
+hold on, grid on
+scatter(real(diag(eigs)),imag(diag(eigs)),'ok')
+axis([-1.1 1.1 -1.1 1.1]);
 
 %% Plot mu
 figure;

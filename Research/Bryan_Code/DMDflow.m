@@ -218,6 +218,16 @@ if true
     %set(gca,'position',[0.64 .1 .3 .8])
     title('DMD mode 4','fontsize',18)
 
+
+    %  Plot DMD spectrum
+    figure
+    theta = (0:1:100)*2*pi/100;
+    plot(cos(theta),sin(theta),'k--') % plot unit circle
+    hold on, grid on
+    scatter(real(lambda),imag(lambda),'ok')
+    axis([-1.1 1.1 -1.1 1.1]);
+
+
 end
 
 

@@ -1,5 +1,6 @@
 clear all; close all; %clc
-load ../output/091226_DLEseriesB.mat
+%load ../output/091226_DLEseriesB.mat
+load DLEseriesB.mat
 
 dim1=size(DLE,1);dim2=size(DLE,2);
 Nt=120;
@@ -12,30 +13,30 @@ end
 % M=M';
 size(M);
 
-for Ti=1:100
-n=20;
-X = M(:,Ti:n-1+Ti);
-X2 = M(:,Ti+1:n+Ti);
-[U,S,V] = svd(X,'econ');
-
-%%  Compute DMD (Phi are eigenvectors)
-r = 20;  % truncate at r modes
-U = U(:,1:r);
-S = S(1:r,1:r);
-V = V(:,1:r);
-Atilde = U'*X2*V*inv(S);
-
-XX = M(:,Ti+1:n+Ti);
-XX2 = M(:,Ti+2:n+1+Ti);
-[U,S,V] = svd(XX,'econ');
-
-%%  Compute DMD (Phi are eigenvectors)
-r = 20;  % truncate at r modes
-U = U(:,1:r);
-S = S(1:r,1:r);
-V = V(:,1:r);
-Atilde1 = U'*XX2*V*inv(S);
-errs(Ti)=norm(Atilde-Atilde1);
+for Ti=1:100 %Sliding window of length n
+    n=20;
+    X = M(:,Ti:n-1+Ti); %Current set of n. Do DMD
+    X2 = M(:,Ti+1:n+Ti);
+    [U,S,V] = svd(X,'econ');
+    
+    %%  Compute DMD (Phi are eigenvectors)
+    r = 20;  % truncate at r modes
+    U = U(:,1:r);
+    S = S(1:r,1:r);
+    V = V(:,1:r);
+    Atilde = U'*X2*V*inv(S);
+    
+    XX = M(:,Ti+1:n+Ti); %Next set of n in sliding window. Do DMD and compare
+    XX2 = M(:,Ti+2:n+1+Ti);
+    [U,S,V] = svd(XX,'econ');
+    
+    %%  Compute DMD (Phi are eigenvectors)
+    r = 20;  % truncate at r modes
+    U = U(:,1:r);
+    S = S(1:r,1:r);
+    V = V(:,1:r);
+    Atilde1 = U'*XX2*V*inv(S);
+    errs(Ti)=norm(Atilde-Atilde1);
 end
 
 plot(1:100,errs)
