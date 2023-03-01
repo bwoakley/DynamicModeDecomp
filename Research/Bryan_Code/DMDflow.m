@@ -6,10 +6,10 @@ format long;
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 6;                       %Truncate to r singular values
+r = 30;                       %Truncate to r singular values
 
-N = 10;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
-pred = 90;                   %pred = number of time steps forward to predict.
+N = 40;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+pred = 10;                   %pred = number of time steps forward to predict.
 if N+pred>100
     disp('Need more data')
 end
@@ -19,7 +19,7 @@ flowCase = 1;   %flowCase decides what flow to use.
                 % flowCase = 2 means Linear flow (-x,y)
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
 
-[ Xpred, Xdmd, stateVecs, lambda, S ] = DMDpred( pred, N, r, flowCase, kk );
+[ Xpred, Xdmd, stateVecs, Phi, lambda, S ] = DMDpred( pred, N, r, flowCase, kk );
 
 
 %% Activate block to plot error for various r
@@ -61,7 +61,7 @@ end
 %Consider :
 %N = 10
 %r = 5, 6, or 9
-if false
+if true
     
     %Now analize the error at each time step
     error = zeros(1,pred);
@@ -159,20 +159,69 @@ end
 %% Plot the predicted flow
 if true
 
+    tt = 5; %time steps forward from N to observe
+            %End time is T = tt*dt = 5*.02=.1
+    upred = reshape( Xdmd(1:kk^2,tt) , kk,kk );
+    vpred = reshape( Xdmd(kk^2+1:end,tt) , kk,kk );
+
+    utrue = reshape( stateVecs(1:kk^2,N+tt) , kk,kk );
+    vtrue = reshape( stateVecs(kk^2+1:end,N+tt) , kk,kk );
 
 
+    figure1=figure('Position',[150 200 1200 300]);
 
+    axes1 = axes('Parent',figure1,'Position',[.07 .1 .4 .8]);
+    pcolor(real(upred)');shading interp;colorbar;daspect([1 1 1])%forecasting step
+    title('Horizontal component of forecasted field at T=0.1')
+    hold on;
 
+    axes3 = axes('Parent',figure1,'Position',[.55 .1 .4 .8]);
+    pcolor(real(upred)'-utrue');shading interp;colorbar;daspect([1 1 1])%forecasting step
+    title('Error in horizontal component at T=0.1')
+    hold off;
 
 
 end
 
+%% Plot the singular values and DMD modes
+if true
 
+    figure2=figure('Position',[150 200 1400 300]);
+    subplot(1,4,1)
+    tempS = diag(S);
+    semilogy([1:r],real(tempS(1:r)))
+    %set(gca,'position',[0.07 .2 .14 .6])
+    title('Singular values','fontsize',18)
+    xlabel('Modal number');ylabel('Singular value')
+    
+    Ut=reshape(Phi(1:kk^2,1),kk,kk);
+    Ut=Ut';
+    subplot(1,4,2)
+    pcolor(real(Ut));shading interp;daspect([1 1 1]);colorbar;hold on;
+    xlabel('X');ylabel('Y')
+    %set(gca,'position',[0.64 .1 .3 .8])
+    title('DMD mode 2','fontsize',18)
 
+    Ut=reshape(Phi(1:kk^2,2),kk,kk);
+    Ut=Ut';
+    subplot(1,4,3)
+    pcolor(real(Ut));shading interp;daspect([1 1 1]);colorbar;hold on;
+    xlabel('X');ylabel('Y')
+    %set(gca,'position',[0.64 .1 .3 .8])
+    title('DMD mode 3','fontsize',18)
+
+    Ut=reshape(Phi(1:kk^2,3),kk,kk);
+    Ut=Ut';
+    subplot(1,4,4)
+    pcolor(real(Ut));shading interp;daspect([1 1 1]);colorbar;hold on;
+    xlabel('X');ylabel('Y')
+    %set(gca,'position',[0.64 .1 .3 .8])
+    title('DMD mode 4','fontsize',18)
+
+end
 
 
                 
-
 
 
 

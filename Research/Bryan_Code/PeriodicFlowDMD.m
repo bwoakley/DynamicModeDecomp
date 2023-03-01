@@ -183,3 +183,16 @@ title('DMD mode 2','fontsize',18)
 % hold on, grid on
 % scatter(real(diag(eigs)),imag(diag(eigs)),'ok')
 % axis([-1.1 1.1 -1.1 1.1]);
+
+%% Plot mu
+figure;
+plot(real(mu),'*-')
+hold on; 
+plot(imag(mu),'o-')
+hold off;
+title('Real and imaginary parts of the eigenvalues $\mu$ of $\widetilde{A}$','interpreter','latex')
+legend('Real part','Imaginary part')
+
+
+% figure;
+% plot(ss)

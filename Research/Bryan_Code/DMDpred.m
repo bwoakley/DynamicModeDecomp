@@ -1,4 +1,4 @@
-function [Xpred, Xdmd, stateVecs, lambda, S] = DMDpred(pred,N,r,flowCase,kk )
+function [Xpred, Xdmd, stateVecs, Phi, lambda, S] = DMDpred(pred,N,r,flowCase,kk )
 %%This function will return the predictions for various choices of 
 % N,pred, and r
 
@@ -65,7 +65,7 @@ for i = 1:no_of_steps
 
             %Length of domain
             L = 3;
-           x=linspace(0,L,kk*3+1); 
+            x=linspace(0,L,kk*3+1); 
             y=linspace(0,L,kk*3+1);
             xa=x(kk+1:2*kk);ya=y(kk+1:2*kk);
             [XST, YST]=meshgrid(xa,ya);
