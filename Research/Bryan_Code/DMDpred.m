@@ -1,4 +1,4 @@
-function [Xpred, Xdmd, stateVecs, Phi, lambda, S] = DMDpred(pred,N,r,flowCase,kk )
+function [Xpred, Xdmd, stateVecs, Phi, lambda, S, Atilde, X1] = DMDpred(pred,N,r,flowCase,kk )
 %%This function will return the predictions for various choices of 
 % N,pred, and r
 
@@ -71,6 +71,8 @@ for i = 1:no_of_steps
             [XST, YST]=meshgrid(xa,ya);
             u1 = -1*(1-dt*i/10)*(XST-1.5);
             v1 = (1-dt*i/10)*(YST-1.5);  
+
+            (1-dt*i/10)
         end
 %         figure;
 %         quiver(u1,v1)
@@ -87,7 +89,7 @@ end
 X1 = stateVecs(:,1:N-1);
 X2 = stateVecs(:,2:N);
 
-[Phi, lambda, b, Xdmd, S] = DMD(X1,X2,pred,N,r,dt);
+[Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,N,r,dt);
 D = diag(lambda);
 
 

@@ -1,7 +1,7 @@
 close all
 clear all
 
-N = 1000;
+N = 20;
 t = linspace(0,3*pi/2,N);
 
 for i = 1:N-1
@@ -12,3 +12,7 @@ end
 
 figure
 plot(v,w)
+
+v 
+
+w

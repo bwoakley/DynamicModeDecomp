@@ -6,23 +6,23 @@ format long;
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 30;                       %Truncate to r singular values
+r = 1;                       %Truncate to r singular values
 
-N = 40;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
-pred = 10;                   %pred = number of time steps forward to predict.
+N = 5;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+pred = 1;                   %pred = number of time steps forward to predict.
 if N+pred>100
     disp('Need more data')
 end
 
-flowCase = 1;   %flowCase decides what flow to use. 
+flowCase = 3;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
                 % flowCase = 2 means Linear flow (-x,y)
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
 
-[ Xpred, Xdmd, stateVecs, Phi, lambda, S ] = DMDpred( pred, N, r, flowCase, kk );
+[ Xpred, Xdmd, stateVecs, Phi, lambda, S, Atilde, X1 ] = DMDpred( pred, N, r, flowCase, kk );
 
 
-%% Activate block to plot error for various r
+% Activate block to plot error for various r
 %Here I used:
 % pred = 90;                   
 % N = 10; 
@@ -55,13 +55,13 @@ if false
 end
 
 
-%% Activate block to:
+% Activate block to:
 % Plot error and
 % plot singular values and eigenvalues
 %Consider :
 %N = 10
 %r = 5, 6, or 9
-if true
+if false
     
     %Now analize the error at each time step
     error = zeros(1,pred);
@@ -129,7 +129,7 @@ if true
 end
 
 
-%% Now fix r and vary N.
+% Now fix r and vary N.
 if false
 
     flowCase = 1; %flowCase decides what flow to use. flowCase = 1 means 'turb'
@@ -156,8 +156,8 @@ if false
 end
 
 
-%% Plot the predicted flow
-if true
+% Plot the predicted flow
+if false
 
     tt = 5; %time steps forward from N to observe
             %End time is T = tt*dt = 5*.02=.1
@@ -183,8 +183,8 @@ if true
 
 end
 
-%% Plot the singular values and DMD modes
-if true
+% Plot the singular values and DMD modes
+if false
 
     figure2=figure('Position',[150 200 1400 300]);
     subplot(1,4,1)
@@ -230,8 +230,13 @@ if true
 
 end
 
+Atilde
 
-                
+Atilde*.902
 
+
+[W, S, V] = svd(X1, 'econ');
+
+V
 
 

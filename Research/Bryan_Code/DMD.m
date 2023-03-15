@@ -1,4 +1,4 @@
-function [Phi, lambda, b, Xdmd, S] = DMD(X1,X2,pred,N,r,dt)
+function [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,N,r,dt)
 
 %% This code is borrowed from KutzBrunton2016 book.
 
