@@ -32,14 +32,14 @@ dt = .02;                   %time step size
 rows = (kk^2)*2;
 stateVecs = zeros(rows,no_of_steps);
 
-for i = start_index:(no_of_steps+start_index)
+for i = 1:no_of_steps
 
         if flowCase == 1   %then choose 'turb' flow
             
             %data file name
             ss='Turb';
     
-            ii = i + 1000;
+            ii = i + 1000 + start_index-1;
             st=strcat('../Cases/',ss,'/bin0',num2str(ii));
             fid=fopen(st,'rb');
             data=fread(fid,[1 1],'*float');
@@ -60,7 +60,9 @@ for i = start_index:(no_of_steps+start_index)
             u1 = -1*(XST-1.5);
             v1 = YST-1.5; 
         elseif flowCase == 3
-
+  
+            ii = i + start_index-1;
+ 
             %Length of domain
             L = 3;
             x=linspace(0,L,kk*3+1); 

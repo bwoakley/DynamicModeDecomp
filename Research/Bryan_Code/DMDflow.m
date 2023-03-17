@@ -3,18 +3,22 @@ close all;
 clc;
 format long;
 
+v = VideoWriter('evalsOfAtilde.avi');
+open(v)
+
+
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 4;                       %Truncate to r singular values
+r = 11;                       %Truncate to r singular values
 
-N = 5;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+N = 20;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 pred = 1;                   %pred = number of time steps forward to predict.
 if N+pred>100
     disp('Need more data')
 end
 
-no_Windows = 1;            %How many windows of length N to compute
+no_Windows = 30;            %How many windows of length N to compute
 
 flowCase = 1;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
@@ -234,19 +238,106 @@ if false
 end
 
 
-start_index = 1;
-[X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index );
+U1W1 = zeros(kk, kk);
+U1W2 = zeros(kk, kk);
+s1 = zeros(1,no_Windows);
+s2 = zeros(1,no_Windows);
+s3 = zeros(1,no_Windows);
+s4 = zeros(1,no_Windows);
 
-[Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r);
+for start_index = 1 : no_Windows
+
+    i = start_index;
+
+    [X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index );
+    
+    [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r);
+
+
+    %  Plot DMD spectrum
+    figure;
+    set(gcf,'position',[100 100 800 700])
+    theta = (0:1:100)*2*pi/100;
+    plot(cos(theta),sin(theta),'k--');      % plot unit circle
+    hold on, grid on
+    scatter(real(lambda),imag(lambda),'ok');
+    axis([-1.1 1.1 -1.1 1.1]);
+    title(['Window number ', num2str(start_index)])
+     
+    frame = getframe(gcf);
+    writeVideo(v,frame);
+
+    %Atilde
+    %[Z_r , D] = eig(Atilde);
+
+    %Plot the e.vals.
+    ss = lambda;
+    s1(i) = real(ss(1));
+    s2(i) = real(ss(2));
+    s3(i) = real(ss(3));
+    s4(i) = real(ss(4));
+    
+
+  
+
+
+    %Plot the DMD modes
+%     figure;
+    Ut=reshape(Phi(1:kk^2,1),kk,kk);
+    Ut=Ut';
+    if start_index == 1
+        U1W1 = Ut;
+    elseif start_index == 2
+        U1W2 = Ut;
+    end
+        
+%     pcolor(real(Ut));shading interp;daspect([1 1 1]);colorbar;hold on;
+%     xlabel('X');ylabel('Y')
+%     set(gca,'position',[0.64 .1 .3 .8])
+%     title('DMD mode 1','fontsize',18)
+
+end
+
+%Plot chang in DMD mode 1
+% pcolor(real(U1 - U2));shading interp;daspect([1 1 1]);colorbar;hold on;
+% xlabel('X');ylabel('Y')
+% title('Difference of U1 and U2','fontsize',18)
+
+%Plot evals over windows
+% figure;
+% plot(s1)
+% 
+% figure;
+% plot(s2)
+% 
+% figure;
+% plot(s3)
+% 
+% figure;
+% plot(s4)
+% 
 
 
 
 
-%Atilde
 
-%[Z_r , D] = eig(Atilde)
 
-%[W, S, V] = svd(X1, 'econ');
-%V
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

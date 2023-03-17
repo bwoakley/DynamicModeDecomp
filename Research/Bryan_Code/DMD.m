@@ -1,6 +1,6 @@
-function [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r)
+function [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r_orig)
 
-%% This code is borrowed from KutzBrunton2016 book.
+% This code is borrowed from KutzBrunton2016 book.
 
 % function [Phi ,omega ,lambda ,b,Xdmd ] = DMD(X1,X2,r,dt)
 % Computes the Dynamic Mode Decomposition of X1, X2
@@ -18,9 +18,20 @@ function [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r)
 % lambda , the discrete -time DMD eigenvalues
 % b, a vector of magnitudes of modes Phi
 % Xdmd, the data matrix reconstructed by Phi , omega , b
-%% DMD
+
+% DMD
 [W, S, V] = svd(X1, 'econ');
-r = min(r, size(W,2));
+ss=diag(S);
+ind=find(ss>ss(1)*1e-10);
+% ss(ind)
+
+%%  Compute DMD (Phi are eigenvectors)
+max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
+r = min([r_orig, size(W,2), max_r]);
+if r < r_orig
+    disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
+end
+
 W_r = W(:, 1:r); % truncate to rank-r
 S_r = S(1:r, 1:r);
 V_r = V(:, 1:r);
@@ -44,7 +55,8 @@ lambda = diag(D); % discrete -time eigenvalues
 %end;
 %Xdmd = Phi * time_dynamics ;
 
-%% Reconstructing DMD
+
+% Reconstructing DMD
 Nf=pred;%number of time steps forward 
 x1=X2(:,end);%Take the last snap shot from X2
 b=Phi\x1;%Obtain initial condition from last snapshot
