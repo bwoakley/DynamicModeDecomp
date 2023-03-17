@@ -14,14 +14,12 @@ if N+pred>100
     disp('Need more data')
 end
 
-no_Windows = 1;            %How many windows of length N to compute
-
 flowCase = 1;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
                 % flowCase = 2 means Linear flow (-x,y)
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
 
-%[ Xpred, Xdmd, stateVecs, Phi, lambda, S, Atilde, X1 ] = DMDpred( pred, N, r, flowCase, kk, no_Windows);
+[ Xpred, Xdmd, stateVecs, Phi, lambda, S, Atilde, X1 ] = DMDpred( pred, N, r, flowCase, kk );
 
 
 % Activate block to plot error for various r
@@ -234,10 +232,8 @@ if false
 end
 
 
-start_index = 1;
-[X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index );
 
-[Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r);
+
 
 
 

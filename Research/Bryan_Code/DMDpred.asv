@@ -1,4 +1,4 @@
-function [Xpred, Xdmd, stateVecs, Phi, lambda, S, Atilde, X1] = DMDpred(pred,N,r,flowCase,kk )
+function [Xpred, Xdmd, stateVecs, Phi, lambda, S, Atilde, X1] = DMDpred( pred, N, r, flowCase, kk, no_Windows )
 %%This function will return the predictions for various choices of 
 % N,pred, and r
 
