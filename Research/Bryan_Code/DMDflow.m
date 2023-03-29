@@ -3,7 +3,7 @@ close all;
 clc;
 format long;
 
-v = VideoWriter('evalsOfAtilde.avi');
+v = VideoWriter('temp.avi');
 open(v)
 
 
@@ -12,13 +12,13 @@ rows = (kk^2)*2;             %Number of rows in the snapshots
 
 r = 11;                       %Truncate to r singular values
 
-N = 20;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+N = 99;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 pred = 1;                   %pred = number of time steps forward to predict.
 if N+pred>100
     disp('Need more data')
 end
 
-no_Windows = 30;            %How many windows of length N to compute
+no_Windows = 1;            %How many windows of length N to compute
 
 flowCase = 1;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
@@ -304,8 +304,9 @@ end
 % title('Difference of U1 and U2','fontsize',18)
 
 %Plot evals over windows
+% tt = linspace(1,N);
 % figure;
-% plot(s1)
+% scatter(tt,s1,'ok')
 % 
 % figure;
 % plot(s2)
@@ -315,7 +316,7 @@ end
 % 
 % figure;
 % plot(s4)
-% 
+
 
 
 

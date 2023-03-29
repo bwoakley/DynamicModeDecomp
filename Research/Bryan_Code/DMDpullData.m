@@ -39,7 +39,7 @@ for i = 1:no_of_steps
             %data file name
             ss='Turb';
     
-            ii = i + 1000 + start_index-1;
+            ii = i + 1000 + start_index-1+20;
             st=strcat('../Cases/',ss,'/bin0',num2str(ii));
             fid=fopen(st,'rb');
             data=fread(fid,[1 1],'*float');
@@ -48,6 +48,10 @@ for i = 1:no_of_steps
             data=reshape(data,kk,kk,3);
             u1 = data(:,:,1)' ;
             v1 = data(:,:,2)' ;
+            omega = data(:,:,3)' ;
+
+%             figure;
+            pcolor(omega); shading interp; drawnow;
 
         elseif flowCase == 2
 
