@@ -10,15 +10,17 @@ open(v)
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 11;                       %Truncate to r singular values
+r = 30;                       %Truncate to r singular values
 
-N = 99;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 pred = 1;                   %pred = number of time steps forward to predict.
-if N+pred>100
+if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 1;            %How many windows of length N to compute
+no_Windows = 30;            %How many windows of length N to compute
+shift = 48;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
+
 
 flowCase = 1;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
@@ -249,7 +251,7 @@ for start_index = 1 : no_Windows
 
     i = start_index;
 
-    [X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index );
+    [X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index+shift );
     
     [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r);
 
@@ -262,10 +264,12 @@ for start_index = 1 : no_Windows
     hold on, grid on
     scatter(real(lambda),imag(lambda),'ok');
     axis([-1.1 1.1 -1.1 1.1]);
-    title(['Window number ', num2str(start_index)])
+    title(['Window number ', num2str(start_index + shift)])
      
     frame = getframe(gcf);
     writeVideo(v,frame);
+    
+    close all;
 
     %Atilde
     %[Z_r , D] = eig(Atilde);

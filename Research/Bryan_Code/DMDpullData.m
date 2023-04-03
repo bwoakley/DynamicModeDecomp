@@ -37,9 +37,9 @@ for i = 1:no_of_steps
         if flowCase == 1   %then choose 'turb' flow
             
             %data file name
-            ss='Turb';
+            ss='Tur5';
     
-            ii = i + 1000 + start_index-1+20;
+            ii = i + 1000 + start_index-1;
             st=strcat('../Cases/',ss,'/bin0',num2str(ii));
             fid=fopen(st,'rb');
             data=fread(fid,[1 1],'*float');
@@ -51,7 +51,7 @@ for i = 1:no_of_steps
             omega = data(:,:,3)' ;
 
 %             figure;
-            pcolor(omega); shading interp; drawnow;
+%             pcolor(omega); shading interp; drawnow;
 
         elseif flowCase == 2
 
