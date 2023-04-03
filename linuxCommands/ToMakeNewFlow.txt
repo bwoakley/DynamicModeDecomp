@@ -1,3 +1,12 @@
+%%%% Troubleshoot diablo code:
+
+Error when making diablo:
+ifort: command line error: option '-openmp' is not supported. Please use the replacement option '-qopenmp'
+
+Solution:
+In Makefile, change openmp to qopenmp
+
+
 %%%%%To make a new flow:
 
 When changing cases, there are 3-5 places to update:
