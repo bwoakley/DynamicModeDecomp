@@ -3,7 +3,7 @@ close all;
 clc;
 format long;
 
-make_movie = true;         %Set to true to plot movie of evals
+make_movie = false;         %Set to true to plot movie of evals
 if make_movie                   
     v = VideoWriter('temp.avi');
     open(v)
@@ -253,9 +253,16 @@ end
     % s3 = zeros(1,no_Windows);
     % s4 = zeros(1,no_Windows);
 
+
 %Keep track of coeff b over no_Windows
-    bVecAbs = zeros(r, no_Windows);
-    domModeVec = zeros(1, no_Windows);
+%     bVecAbs = zeros(r, no_Windows);
+%     domModeVec = zeros(1, no_Windows);
+%     domEval = zeros(1, no_Windows);
+
+%Now update above to track top number of evals
+top = 20;    %Number of top eval to track
+topEval = zeros(top, no_Windows);
+
 
 for start_index = 1 : no_Windows
 
@@ -323,25 +330,35 @@ for start_index = 1 : no_Windows
     end
 
 
-    if false   %Find dominant mode
+    if true   %Find dominant mode
         bAbs = abs(b);
-            
-        bVecAbs(:,i) = bAbs;
+        [sort_bAbs, idx] = sort(bAbs,'descend');
+
+        for modeNumber = 1:top
+            topEval(modeNumber,i) = lambda(idx(modeNumber));
+        end
     
-        [domModeVal, domMode] = max(bAbs);
-    
-        domModeVec(i) =  domMode;
+     
+
+        
+%         bVecAbs(:,i) = bAbs;
+%         [domModeVal, domMode] = max(bAbs);
+%         domModeVec(i) =  domMode;
     
     %     How to find the conjugate of the dominant mode?
     %     temp = bAbs;
     %     temp(domMode) =  temp(domMode)- 1*1e-10;
     %     temp
-        lambda(domMode)
+
+%         domEval(i) = lambda(domMode);
+
+        
+    
     end
 
 end
 
-%Plot chang in DMD mode 1
+%Plot change in DMD mode 1
 if false
     % pcolor(real(U1 - U2));shading interp;daspect([1 1 1]);colorbar;hold on;
     % xlabel('X');ylabel('Y')
@@ -362,26 +379,57 @@ if false
     % plot(s4)
 end
 
-
-
-% bVecAbs
-% 
-% domModeVec
-
-
-
-
-
-
-
-
+%Plot dominant eval
+if false
+    figure
+    plot(abs(domEval))
+    title('Modulus of dominant eval','fontsize',18)
+    
+    figure
+    plot(abs(angle(domEval)))
+    title('Angle of dominant eval','fontsize',18)
+end
 
 
 
 
+%Plot top evals
+
+linS = {'-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--'};
+tim = linspace(1,no_Windows,no_Windows);
+
+
+figure;
+absTopEval = abs(topEval);
+
+for modeNumber = 1:top
+    
+    plot( tim, absTopEval(modeNumber,:),'linestyle', linS(modeNumber) )
+    hold on;
+
+end
+axis([1 400 .95 1.1])
+hold off;
+title('Modulus of top evals','fontsize',18)
+legend('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20')
 
 
 
+
+
+
+figure;
+angleTopEval = abs(angle(topEval));
+
+for modeNumber = 1:top
+    
+    plot( tim, angleTopEval(modeNumber,:),'linestyle', linS(modeNumber) )
+    hold on;
+
+end
+hold off;
+title('Angle of top evals','fontsize',18)
+legend('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20')
 
 
 
