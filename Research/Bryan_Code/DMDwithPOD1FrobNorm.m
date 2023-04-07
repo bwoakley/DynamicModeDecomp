@@ -37,8 +37,25 @@ for Ti=1:100 %Sliding window of length n
     V = V(:,1:r);
     Atilde1 = U'*XX2*V*inv(S);
     errs(Ti)=norm(Atilde-Atilde1);
+    errs2(Ti)=norm(abs(Atilde)-abs(Atilde1));
+
 end
 
+figure;
 plot(1:100,errs)
 xlabel('Time');title('$||\tilde{A}_{i+1}-\tilde{A}_i||$','Interpreter', 'latex');ylabel('error');
 set(gca,'fontsize',18)
+
+
+figure;
+plot(1:100,errs2)
+xlabel('Time');title('$|| |\tilde{A}_{i+1}| - |\tilde{A}_i| ||$','Interpreter', 'latex');ylabel('error');
+set(gca,'fontsize',18)
+
+
+
+
+
+
+
+
