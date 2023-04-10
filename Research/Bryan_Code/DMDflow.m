@@ -2,7 +2,7 @@ clear all;
 close all;
 clc;
 format long;
-
+tic
 
 make_movie = false;         %Set to true to plot movie of evals
 if make_movie                   
@@ -13,17 +13,17 @@ end
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 24;                       %Truncate to r singular values
+r = 16;                       %Truncate to r singular values
 
-N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+N = 50;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
 pred = 1;                   %pred = number of time steps forward to predict.
 if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 399;            %How many windows of length N to compute
-shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
+no_Windows = 20;            %How many windows of length N to compute
+shift = 15;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
 flowCase = 1;   %flowCase decides what flow to use. 
@@ -176,7 +176,7 @@ end
 
 
 %Now track top number of evals
-top = 6;                %Number of top eval to track
+top = 2;                %Number of top eval to track
 topEval = zeros(top, no_Windows);
 truncate = top;         %Number of top modes to keep when truncating Atilde
 
@@ -280,8 +280,8 @@ for start_index = 1 : no_Windows
 
     [sort_bAbs, idx] = sort(bAbs,'descend');
 
-    %Plot the b's. Is there an exponential drop in the coeff b?
-    if true
+    plotBs = false; %Plot the b's. Is there an exponential drop in the coeff b?
+    if plotBs
         R =length(b);
         x = linspace(1,R,R);
         y = log(sort_bAbs);
@@ -295,6 +295,7 @@ for start_index = 1 : no_Windows
     %     f = polyval(p,x);
     %     plot(x,y,'o',x,f,'-') 
     end
+
 
     for modeNumber = 1:top
         topEval(modeNumber,i) = lambda(idx(modeNumber));
@@ -462,7 +463,7 @@ end
 
 
 %Plot top evals
-plot_eval = false;    %Set true to plot top evals
+plot_eval = true;    %Set true to plot top evals
 if plot_eval
     
 %     linS = {'-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--'};
@@ -479,12 +480,13 @@ if plot_eval
         hold on;
     
     end
-    axis([1 no_Windows .95 1.1])
+    %axis([1 no_Windows .95 1.1])
     hold off;
     title('Modulus of top evals','fontsize',18)
 %     legend('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20')
-    legend('1','2','3','4','5','6')
-    
+%     legend('1','2','3','4','5','6')
+    legend('1','2')
+ 
 
 
     figure;
@@ -499,15 +501,58 @@ if plot_eval
     hold off;
     title('Angle of top evals','fontsize',18)
 %     legend('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20')
-    legend('1','2','3','4','5','6')
+%     legend('1','2','3','4','5','6')
+    legend('1','2')
+
+
+
+    %Decompose top eval pair using fft
+    if true
+        Eval1 = absTopEval(1,:);
+        Y = fft(Eval1);
+        P2 = abs(Y/no_Windows);
+%         P1 = P2(1:no_Windows/2+1);
+%         P1(2:end-1) = 2*P1(2:end-1);
+        
+        
+        
+        k = (0:no_Windows-1);
+%         k = (0:L/2)/1.5;
+%         k = (0:no_Windows/2);
+        
+        figure;
+        plot(k, P2)
+    
+        kk = 1;     %Use kk modes to approx Eval1
+        approxEval1 = 0;
+        for i = 1:kk
+            approxEval1 = approxEval1 + 0;
+        end
+
+%         figure;
+%         plot(Eval1)
+
+    end
+
     
 end
 
-figure;
-plot(pVec(1,:))
-title('Exp rate of b')
 
-figure;
-plot(pVec(2,:))
-title('y int of log of b')
+%Plot the b's. Is there an exponential drop in the coeff b?
+if plotBs
 
+    figure;
+    plot(pVec(1,:))
+    title('Exp rate of b')
+    
+    figure;
+    plot(pVec(2,:))
+    title('y int of log of b')
+
+end
+
+
+
+
+
+toc
