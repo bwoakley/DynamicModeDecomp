@@ -3,7 +3,6 @@ close all;
 clc;
 format long;
 
-plot_eval = false;    %Set true to plot top evals
 
 make_movie = false;         %Set to true to plot movie of evals
 if make_movie                   
@@ -14,7 +13,7 @@ end
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 4;                       %Truncate to r singular values
+r = 24;                       %Truncate to r singular values
 
 N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
@@ -23,7 +22,7 @@ if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 2;            %How many windows of length N to compute
+no_Windows = 399;            %How many windows of length N to compute
 shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
@@ -63,77 +62,6 @@ flowCase = 1;   %flowCase decides what flow to use.
     hold on; 
     plot(imag(lambda),'o-')
     hold off;
-
-end
-
-% Activate block to Plot error, plot singular values and eigenvalues
-if false
-    %Consider :
-    %N = 10
-    %r = 5, 6, or 9
-
-    %Now analize the error at each time step
-    error = zeros(1,pred);
-    %errorC = zeros(1,pred);
-    
-    for i = 1:pred+1
-    
-        temp = Xpred(:,i) - stateVecs(:,N-1+i) ;
-        error(i) = sumabs(real(temp));
-        %errorC(i) = sumabs(imag(temp));
-    
-    end
-
-    uMax = max(abs(stateVecs(:,1)));
-    
-    error = error/(rows*uMax);     %Normalize it
-    error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
-    
-    % figure;
-    % plot(error,'o-')
-    % hold on;
-    % plot(errorC,'*-')
-    % hold off;
-        
-    %Now analize the error at each time step, for Xdmd prediction
-    error2 = zeros(1,pred);
-    % errorC = zeros(1,pred);
-    
-    for i = 1:pred
-    
-        temp = Xdmd(:,i) - stateVecs(:,N+i) ; %Xdmd(1) ~ stateVec(N+1)
-        error2(i) = sumabs(real(temp));
-    %     errorC(i) = sumabs(imag(temp));
-    
-    end
-    
-    error2 = error2/(rows*uMax);     %Normalize it
-       
-    % figure;
-    % plot(error2,'o-')
-    % hold on;
-    % plot(errorC,'*-')
-    % hold off;
-
-    figure;
-    plot(error)
-    title('error')
-
-    figure;
-    plot(error2)
-    title('error2')
-
-    figure;
-    plot(real(lambda),'*-')
-    hold on; 
-    plot(imag(lambda),'o-')
-    hold off;
-    title('Real and imaginary parts of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
-    legend('Real part','Imaginary part')
-    
-    figure;
-    plot(diag(S))
-    title('Singular values of $X_1$','interpreter','latex')
 
 end
 
@@ -248,10 +176,11 @@ end
 
 
 %Now track top number of evals
-top = 6;    %Number of top eval to track
+top = 6;                %Number of top eval to track
 topEval = zeros(top, no_Windows);
-truncate = 4;   %Number of top modes to keep when truncating Atilde
+truncate = top;         %Number of top modes to keep when truncating Atilde
 
+pVec = zeros(2,no_Windows);
 
 for start_index = 1 : no_Windows
 
@@ -317,24 +246,194 @@ for start_index = 1 : no_Windows
         title('DMD mode 1','fontsize',18)
     end
 
-    [Z_r , D] = eig(Atilde);
 
-    Atilde
-
-    if false   %Find dominant mode
-
-        bAbs = abs(b);
-        [sort_bAbs, idx] = sort(bAbs,'descend');
-
-        for modeNumber = 1:top
-            topEval(modeNumber,i) = lambda(idx(modeNumber));
+    if false   %Consider adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
+        [Z_r , D] = eig(Atilde);
+    
+        Atilde;
+    
+        [W, S, V] = svd(X1, 'econ');
+    
+        for j = 1:10
+            for k = 1:N-1
+            headW(j,k) = W(j,k);
+    
+            end
         end
+    
+        headW
+    
+        S
+    
+        V
+    
+        W_r = W(:, 1:r); % truncate to rank-r
+        S_r = S(1:r, 1:r);
+        V_r = V(:, 1:r);
+    end
+
+
+    %Find top modes
+
+    bAbs = abs(b);
+
+
+    [sort_bAbs, idx] = sort(bAbs,'descend');
+
+    %Plot the b's. Is there an exponential drop in the coeff b?
+    if true
+        R =length(b);
+        x = linspace(1,R,R);
+        y = log(sort_bAbs);
+    %     figure;
+    %     i
+        p = polyfit(x,y,1);
+        
+        pVec(1,i) = p(1);
+        pVec(2,i) = p(2);
+    
+    %     f = polyval(p,x);
+    %     plot(x,y,'o',x,f,'-') 
+    end
+
+    for modeNumber = 1:top
+        topEval(modeNumber,i) = lambda(idx(modeNumber));
+    end
+
+    truncIdx = idx(1:truncate);
+
+%        sort_bAbs
+
+%     b(truncIdx)
+%     truncbAbs = bAbs(truncIdx)
+
+    if truncate<r
+        aa = bAbs(idx(truncate));
+        bb = bAbs(idx(truncate+1));
+        if abs(aa - bb) < aa/100
+            disp('Warning: truncAtilde may be complex; the truncation contains an eigenmode but not its conjugate pair.')
+        end
+    end
+
+    %Now truncate to these top modes by truncating lambda and Phi
+    trunclambda = lambda(truncIdx);
+    truncPhi = Phi(:, truncIdx);
+
+    % Reconstructing DMD
+    Nf=pred;                                        %number of time steps forward 
+    x1=X2(:,end);                                   %Take the last snap shot from X2
+    bbb=truncPhi\x1;                  %notice that bbb is slightly different from b            %Obtain initial condition from last snapshot
+    temporal=zeros(truncate,Nf);
+    for ii=1:Nf
+        temporal(:,ii)=bbb.*trunclambda.^ii;%Raise by eigenvalue to power of timestep
+    end
+    truncXdmd=truncPhi*temporal;
+
+
+
+
+    %Compare predictions to DNS
+
+    % Activate block to Plot error. truncDMD vs DNS vs DMD
+    if false
+        
+        error = zeros(1,pred);
+        
+        for iii = 1:pred
+            tempX = Xdmd(:,iii) - stateVecs(:,N+iii) ;
+            error(iii) = sumabs(real(tempX));
+%             errorC(iii) = sumabs(imag(tempX));
+        
+        end
+    
+        uMax = max(abs(stateVecs(:,1)));
+        
+        error = error/(rows*uMax);     %Normalize it
+        %error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
+                   
+        figure;
+        plot(error)
+%         hold on;
+%         plot(errorC)
+        title('DMD vs DNS')
+%         hold off;
+
+
+
+        error2 = zeros(1,pred);
+        
+        for iii = 1:pred
+            tempX = truncXdmd(:,iii) - stateVecs(:,N+iii) ;
+            error2(iii) = sumabs(real(tempX));
+%             error2C(iii) = sumabs(imag(tempX));
+        
+        end
+    
+        uMax = max(abs(stateVecs(:,1)));
+        
+        error2 = error2/(rows*uMax);     %Normalize it
+        %error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
+                   
+        figure;
+        plot(error2)
+%         hold on;
+%         plot(error2C)
+        title('truncDMD vs DNS')
+%         hold off;
+
+
+
+
+
+        error3 = zeros(1,pred);
+        
+        for iii = 1:pred
+            tempX = truncXdmd(:,iii) - Xdmd(:,iii);
+            error3(iii) = sumabs(real(tempX));
+%             error3C(iii) = sumabs(imag(tempX));
+        
+        end
+    
+        uMax = max(abs(stateVecs(:,1)));
+        
+        error3 = error3/(rows*uMax);     %Normalize it
+        %error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
+                   
+        figure;
+        plot(error3)
+%         hold on;
+%         plot(error3C)
+        title('truncDMD vs DMD')
+%         hold off;
+
+
+        figure;
+        plot(error,'-')
+        hold on;
+        plot(error2,'--')
+        hold off;
+        legend('DMD','truncDMD')
+
+
+    %     figure;
+    %     plot(real(lambda),'*-')
+    %     hold on; 
+    %     plot(imag(lambda),'o-')
+    %     hold off;
+    %     title('Real and imaginary parts of the eigenvalues $\Lambda$ of $\widetilde{A}$','interpreter','latex')
+    %     legend('Real part','Imaginary part')
+    %     
+    %     figure;
+    %     plot(diag(S))
+    %     title('Singular values of $X_1$','interpreter','latex')
+    
     end
 
 
 
-
-
+    %Now to improve the algorithm by learning on the evals
+    
+    
 
 
 end
@@ -363,6 +462,7 @@ end
 
 
 %Plot top evals
+plot_eval = false;    %Set true to plot top evals
 if plot_eval
     
 %     linS = {'-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--','-','--'};
@@ -403,9 +503,11 @@ if plot_eval
     
 end
 
+figure;
+plot(pVec(1,:))
+title('Exp rate of b')
 
-
-
-
-
+figure;
+plot(pVec(2,:))
+title('y int of log of b')
 
