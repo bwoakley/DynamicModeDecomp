@@ -22,8 +22,8 @@ if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 20;            %How many windows of length N to compute
-shift = 15;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
+no_Windows = 100;            %How many windows of length N to compute
+shift = 50;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
 flowCase = 1;   %flowCase decides what flow to use. 
@@ -509,28 +509,75 @@ if plot_eval
     %Decompose top eval pair using fft
     if true
         Eval1 = absTopEval(1,:);
-        Y = fft(Eval1);
-        P2 = abs(Y/no_Windows);
-%         P1 = P2(1:no_Windows/2+1);
-%         P1(2:end-1) = 2*P1(2:end-1);
-        
-        
-        
-        k = (0:no_Windows-1);
-%         k = (0:L/2)/1.5;
-%         k = (0:no_Windows/2);
-        
-        figure;
-        plot(k, P2)
-    
-        kk = 1;     %Use kk modes to approx Eval1
-        approxEval1 = 0;
-        for i = 1:kk
-            approxEval1 = approxEval1 + 0;
-        end
+
+        L = no_Windows;
+        t = (1:L)/L;        % Let's rescale time to be just one time unit...
+
+        S = Eval1;
 
 %         figure;
-%         plot(Eval1)
+%         plot(t,S)
+        
+        Y = fft(S);
+
+        rescaledY = Y/L;
+
+
+        Yabs = abs(rescaledY); %Just looking at modulus. Which frequencies have most energy?
+
+        last = ceil(L/2); %Last positive freq
+           
+        Ypos = Yabs(1:last);
+        
+        [sort_Ypos, idx_Ypos] = sort(Ypos,'descend');   %idx_Ypos contains the indices's with most energy
+        top_freq = idx_Ypos - 1;
+                
+        
+        
+        shiftY = fftshift(Y);
+        
+        if mod(L,2) == 0
+            middle = ceil(L/2) + 1;
+        else 
+            middle = ceil(L/2);
+        end
+        
+        
+        
+        
+        
+        kk = 6;     %Use top kk frequencies to approx Eval1. Note kk should be < L/2
+        if kk > last
+            disp('kk too large')
+        end
+        
+        Sapprox = zeros(1,L);
+        
+        for j = 1:kk
+        
+            freq = top_freq(j)
+            Sapprox = Sapprox +  shiftY(middle+freq)*exp((2*pi*1i)*freq*t) + shiftY(middle-freq)*exp((-2*pi*1i)*freq*t);
+          
+        
+        end
+
+        Sapprox = Sapprox/(2*L);
+
+        tempSapprox = Sapprox;     %For some reason, Sapprox is shifted one to the left. Let's shift it back...
+        Sapprox(1) = S(1);
+        for j = 2:L
+            Sapprox(j) = tempSapprox(j-1);
+        end
+                
+        % Sapprox
+        
+        figure; 
+        plot(t, S)
+        hold on;
+        plot(t, Sapprox,'--')
+        hold off;
+        legend('orig','approx')
+
 
     end
 
