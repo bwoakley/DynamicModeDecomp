@@ -13,16 +13,16 @@ end
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 3;                       %Truncate to r singular values
+r = 24;                       %Truncate to r singular values
 
-N = 30;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
 pred = 1;                   %pred = number of time steps forward to predict.
 if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 2;            %How many windows of length N to compute
+no_Windows = 399;            %How many windows of length N to compute
 shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
@@ -176,11 +176,14 @@ end
 
 
 %Now track top number of evals
-top = 2;                %Number of top eval to track
+top = 4;                %Number of top eval to track. Usually want top = even
 topEval = zeros(top, no_Windows);
 truncate = top;         %Number of top modes to keep when truncating Atilde
 
 pVec = zeros(2,no_Windows);
+AtildeVec = zeros(r^2,no_Windows);
+truncAtildeVec = zeros(r^2,no_Windows);
+
 
 for start_index = 1 : no_Windows
 
@@ -189,6 +192,8 @@ for start_index = 1 : no_Windows
     [X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index+shift );
     
     [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r);
+    
+    AtildeVec(:,i) = reshape(Atilde,[],1);
 
     if make_movie
         %  Plot DMD spectrum
@@ -246,40 +251,12 @@ for start_index = 1 : no_Windows
         title('DMD mode 1','fontsize',18)
     end
 
-    Atilde
-
-    if false   %Consider adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
-        [Z_r , D] = eig(Atilde);
     
-        Atilde;
-    
-        [W, S, V] = svd(X1, 'econ');
-    
-        for j = 1:10
-            for k = 1:N-1
-            headW(j,k) = W(j,k);
-    
-            end
-        end
-    
-        headW
-    
-        S
-    
-        V
-    
-        W_r = W(:, 1:r); % truncate to rank-r
-        S_r = S(1:r, 1:r);
-        V_r = V(:, 1:r);
-    end
-
-    
-    if false %Turn this on to trucate Atilde to the top modes
+    if true %Turn this on to trucate Atilde to the top modes
+        
         %Find top modes
-    
         bAbs = abs(b);
-    
-    
+   
         [sort_bAbs, idx] = sort(bAbs,'descend');
     
         plotBs = false; %Plot the b's. Is there an exponential drop in the coeff b?
@@ -298,18 +275,12 @@ for start_index = 1 : no_Windows
         %     plot(x,y,'o',x,f,'-') 
         end
     
-    
         for modeNumber = 1:top
             topEval(modeNumber,i) = lambda(idx(modeNumber));
         end
     
         truncIdx = idx(1:truncate);
-    
-    %        sort_bAbs
-    
-    %     b(truncIdx)
-    %     truncbAbs = bAbs(truncIdx)
-    
+        
         if truncate<r
             aa = bAbs(idx(truncate));
             bb = bAbs(idx(truncate+1));
@@ -332,11 +303,35 @@ for start_index = 1 : no_Windows
         end
         truncXdmd=truncPhi*temporal;
     
-    
-    
-    
-        %Compare predictions to DNS
-    
+        
+        %We can also truncate Atilde itself by restricting to those top freq. Perhaps this truncAtilde will sign switch less...
+        [Z_r , D] = eig(Atilde);
+%         Z_r*D/Z_r - Atilde
+%         [Ztilde, Dtilde, Ztilde2] = svd(Atilde, 'econ')
+%         Phi'*Phi
+        truncZ = Z_r(:,truncIdx);
+        tempD = diag(D);
+        truncD = diag( tempD(truncIdx));
+        truncAtilde = truncZ*truncD*pinv(truncZ);
+        
+        imagTruncAtilde = sum(sum(imag(truncAtilde)));
+        if imagTruncAtilde > 1e-10
+            disp('truncAtilde seems to be complex, taking only the real part.')
+        end
+        truncAtilde = real(truncAtilde);
+
+        truncAtildeVec(:,i) = reshape(truncAtilde,[],1);
+
+
+%         E = sum(sum(abs( Atilde-truncAtilde )));
+
+%         [ truncZtilde , truncDtilde ] = eig(truncAtilde);
+        
+%         truncZ - truncZtilde
+%         truncD-truncDtilde
+
+
+        %Compare predictions to DNS    
         % Activate block to Plot error. truncDMD vs DNS vs DMD
         if false
             
@@ -438,6 +433,20 @@ for start_index = 1 : no_Windows
         
         
     end
+
+
+    MatNorm = false;
+    if MatNorm    %Compare Frob norm of diff: abs vs raw
+        if i > 1
+            
+            errs(i-1)=sum(sum(abs(Atilde-prevAtilde)));
+            errs2(i-1)=sum(sum(abs((abs(Atilde)-abs(prevAtilde)))));
+           
+        end
+        prevAtilde = Atilde;
+    end
+
+
 
 end
 
@@ -548,14 +557,14 @@ if plot_eval
         
         
         
-        kk = 6;     %Use top kk frequencies to approx Eval1. Note kk should be < L/2
-        if kk > last
-            disp('kk too large')
+        kkkk = 6;     %Use top kk frequencies to approx Eval1. Note kk should be < L/2
+        if kkkk > last
+            disp('kkkk too large')
         end
         
         Sapprox = zeros(1,L);
         
-        for j = 1:kk
+        for j = 1:kkkk
         
             freq = top_freq(j)
             Sapprox = Sapprox +  shiftY(middle+freq)*exp((2*pi*1i)*freq*t) + shiftY(middle-freq)*exp((-2*pi*1i)*freq*t);
@@ -599,6 +608,59 @@ if plotBs
     title('y int of log of b')
 
 end
+
+%Plot MatNorm of diff
+if MatNorm
+    figure;
+    plot(errs)
+    xlabel('Time');title('$||\tilde{A}_{i+1}-\tilde{A}_i||$','Interpreter', 'latex');ylabel('error');
+    set(gca,'fontsize',18)
+    
+    
+    figure;
+    plot(errs2)
+    xlabel('Time');title('$|| |\tilde{A}_{i+1}| - |\tilde{A}_i| ||$','Interpreter', 'latex');ylabel('error');
+    set(gca,'fontsize',18)
+
+%     figure;
+%     plot(errs)
+%     hold on;
+%     plot(errs2)
+%     hold off;
+%     legend('$||\tilde{A}_{i+1}-\tilde{A}_i||$','$|| |\tilde{A}_{i+1}| - |\tilde{A}_i| ||$','Interpreter', 'latex')
+    
+%     figure;
+%     plot( abs( errs-errs2 ) )
+%     title('errs-errs2')
+end
+
+
+
+
+if true %Plot the entries of Atilde
+    figure;
+    for j = 1:r^2
+        
+        %plot( AtildeVec(j,:)  )     %There are some entries that are approx 1, others seem to be clumped around 0
+    
+        plot( truncAtildeVec(j,:)  )     %There are some entries that are approx 1, others seem to be clumped around 0
+
+        %plot( AtildeVec(j,:) - AtildeVec(j,1) )
+        hold on;
+    
+    end
+    hold off;
+end
+
+
+
+
+
+
+
+
+
+
 
 
 

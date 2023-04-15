@@ -21,6 +21,27 @@ function [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r_orig)
 
 % DMD
 [W, S, V] = svd(X1, 'econ');
+
+adjustV = true;
+if adjustV
+    sizeX1 = size(X1);
+    for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
+        if V(1,j) < 0
+            V(:,j) = -1*V(:,j);
+            W(:,j) = -1*W(:,j);
+        end
+    end
+else
+    disp('consider adjusting V')
+end
+%errorSignSwitch = sum(sum(abs(X1-W*S*V')))  %Notice that adjusting V and W still gives a valid SVD
+
+% for j = 1:5
+%     headW(j,:) = W(j,:);
+% end
+% headW
+
+
 ss=diag(S);
 ind=find(ss>ss(1)*1e-10);
 % ss(ind)
