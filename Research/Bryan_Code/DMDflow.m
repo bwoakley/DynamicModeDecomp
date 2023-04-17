@@ -13,7 +13,7 @@ end
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 24;                       %Truncate to r singular values
+r = 2;                       %Truncate to r singular values
 
 N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
@@ -22,7 +22,7 @@ if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 399;            %How many windows of length N to compute
+no_Windows = 2;            %How many windows of length N to compute
 shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
@@ -195,6 +195,8 @@ for start_index = 1 : no_Windows
     
     AtildeVec(:,i) = reshape(Atilde,[],1);
 
+%     Atilde
+
     if make_movie
         %  Plot DMD spectrum
         figure;
@@ -251,15 +253,14 @@ for start_index = 1 : no_Windows
         title('DMD mode 1','fontsize',18)
     end
 
-    
-    if true %Turn this on to trucate Atilde to the top modes
+    plotBs = false; %Plot the b's. Is there an exponential drop in the coeff b?
+    if false %Turn this on to trucate Atilde to the top modes
         
         %Find top modes
         bAbs = abs(b);
    
         [sort_bAbs, idx] = sort(bAbs,'descend');
     
-        plotBs = false; %Plot the b's. Is there an exponential drop in the coeff b?
         if plotBs
             R =length(b);
             x = linspace(1,R,R);
@@ -637,13 +638,13 @@ end
 
 
 
-if true %Plot the entries of Atilde
+if false %Plot the entries of Atilde
     figure;
     for j = 1:r^2
         
-        %plot( AtildeVec(j,:)  )     %There are some entries that are approx 1, others seem to be clumped around 0
+        plot( AtildeVec(j,:)  )     %There are some entries that are approx 1, others seem to be clumped around 0
     
-        plot( truncAtildeVec(j,:)  )     %There are some entries that are approx 1, others seem to be clumped around 0
+        %plot( truncAtildeVec(j,:)  )     %There are some entries that are approx 1, others seem to be clumped around 0
 
         %plot( AtildeVec(j,:) - AtildeVec(j,1) )
         hold on;
@@ -653,17 +654,39 @@ if true %Plot the entries of Atilde
 end
 
 
+AtildeVecTran = AtildeVec';
+
+writematrix(AtildeVecTran)
+
+AtildeVecTran;
 
 
 
-
-
-
-
-
-
-
-
+% for ii = 1:r
+%     for j = 1:r
+%         indexAtilde(ii,j) = strcat("A", num2str(ii), num2str(j) ) ;
+%     end
+% end
+% indexAtildeVec = reshape(indexAtilde,[],1);
+% 
+% AtildeVecTemp = AtildeVec;
+% 
+% 
+% for ii = 1:no_Windows+1
+%     
+%     if ii == 1
+%         AtildeVecWithIndex(:,ii) = indexAtildeVec(:);
+%     else
+%         AtildeVecWithIndex(:,ii) = AtildeVecTemp(:,ii-1);
+%     end
+% 
+% end
+% 
+% AtildeVecWithIndexTran = AtildeVecWithIndex';
+% 
+% writematrix(AtildeVecWithIndexTran)
+% 
+% AtildeVecWithIndexTran
 
 
 toc
