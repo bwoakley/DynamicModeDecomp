@@ -13,17 +13,17 @@ end
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 2;                       %Truncate to r singular values
+r = 6;                       %Truncate to r singular values
 
-N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+N = 10;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
-pred = 1;                   %pred = number of time steps forward to predict.
+pred = 10;                   %pred = number of time steps forward to predict.
 if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 2;            %How many windows of length N to compute
-shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
+no_Windows = 10;            %How many windows of length N to compute
+shift = 50;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
 flowCase = 1;   %flowCase decides what flow to use. 
@@ -334,7 +334,7 @@ for start_index = 1 : no_Windows
 
         %Compare predictions to DNS    
         % Activate block to Plot error. truncDMD vs DNS vs DMD
-        if false
+        if true
             
             error = zeros(1,pred);
             
@@ -654,39 +654,35 @@ if false %Plot the entries of Atilde
 end
 
 
-AtildeVecTran = AtildeVec';
 
-writematrix(AtildeVecTran)
+if false  %Save the Atilde to a csv file
+    AtildeVecTran = AtildeVec';
+    
+    writematrix(AtildeVecTran)
+end
 
-AtildeVecTran;
 
+if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
+    error = zeros(1,pred);
+            
+    for iii = 1:pred
+        tempX = Xdmd(:,iii) - stateVecs(:,N+iii) ;
+        error(iii) = sumabs(real(tempX));
+%             errorC(iii) = sumabs(imag(tempX));
+    
+    end
 
-
-% for ii = 1:r
-%     for j = 1:r
-%         indexAtilde(ii,j) = strcat("A", num2str(ii), num2str(j) ) ;
-%     end
-% end
-% indexAtildeVec = reshape(indexAtilde,[],1);
-% 
-% AtildeVecTemp = AtildeVec;
-% 
-% 
-% for ii = 1:no_Windows+1
-%     
-%     if ii == 1
-%         AtildeVecWithIndex(:,ii) = indexAtildeVec(:);
-%     else
-%         AtildeVecWithIndex(:,ii) = AtildeVecTemp(:,ii-1);
-%     end
-% 
-% end
-% 
-% AtildeVecWithIndexTran = AtildeVecWithIndex';
-% 
-% writematrix(AtildeVecWithIndexTran)
-% 
-% AtildeVecWithIndexTran
-
+    uMax = max(abs(stateVecs(:,1)));
+    
+    error = error/(rows*uMax);     %Normalize it
+    %error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
+               
+    figure;
+    plot(error)
+%         hold on;
+%         plot(errorC)
+    title('DMD vs DNS')
+%         hold off;
+end
 
 toc
