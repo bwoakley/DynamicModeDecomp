@@ -17,7 +17,7 @@ r = 24;                       %Truncate to r singular values
 
 N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
-pred = 10;                   %pred = number of time steps forward to predict.
+pred = 2;                   %pred = number of time steps forward to predict.
 if N+pred>500
     disp('Need more data')
 end
@@ -689,7 +689,7 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
        disp('Warning: should set N=100, r=24')
    end
 
-   currentAtilde = Atilde;  %Take the Atilde from the last loop as the currentAtilde.
+%    currentAtilde = Atilde;  %Take the Atilde from the last loop as the currentAtilde.
 
    AtildeVec24Tran = importdata('AtildeVec24.csv');
    AtildeVec24 = AtildeVec24Tran';
@@ -703,59 +703,106 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
 %     sum(sum(abs(errorAtilde)))
 
 
-    %Now I need the most recent V_r and X2. We copy the following from DMD.m
-        [W, S, V] = svd(X1, 'econ');
-    
-        adjustV = true;
-        if adjustV
-            sizeX1 = size(X1);
-            for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
-                if V(1,j) < 0
-                    V(:,j) = -1*V(:,j);
-                    W(:,j) = -1*W(:,j);
-                end
-            end
-        else
-            disp('consider adjusting V')
-        end
-            
-        ss=diag(S);
-        ind=find(ss>ss(1)*1e-10);
-    
-        %  Compute DMD (Phi are eigenvectors)
-        max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
-        r = min([r_orig, size(W,2), max_r]);
-        if r < r_orig
-            disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
-        end
-        
-        W_r = W(:, 1:r); % truncate to rank-r
-        S_r = S(1:r, 1:r);
-        V_r = V(:, 1:r);
-    %End of copying from DMD.m
-    
+            %Instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
+                %Now I need the most recent V_r and X2. We copy the following from DMD.m
+            %         [W, S, V] = svd(X1, 'econ');
+            %     
+            %         adjustV = true;
+            %         if adjustV
+            %             sizeX1 = size(X1);
+            %             for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
+            %                 if V(1,j) < 0
+            %                     V(:,j) = -1*V(:,j);
+            %                     W(:,j) = -1*W(:,j);
+            %                 end
+            %             end
+            %         else
+            %             disp('consider adjusting V')
+            %         end
+            %             
+            %         ss=diag(S);
+            %         ind=find(ss>ss(1)*1e-10);
+            %     
+            %         %  Compute DMD (Phi are eigenvectors)
+            %         max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
+            %         r_orig = r;
+            %         r = min([r_orig, size(W,2), max_r]);
+            %         if r < r_orig
+            %             disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
+            %         end
+            %         
+            %         W_r = W(:, 1:r); % truncate to rank-r
+            %         S_r = S(1:r, 1:r);
+            %         V_r = V(:, 1:r);
+                %End of copying from DMD.m
+
+    improvedXdmd = zeros(rows,pred+1);
+    %Now compute DMD with future Atilde, but fixed V_r, S_r, and X2
     for j = 1:pred
 
+        AtildeTemp = AtildeVec24(:,shift+j);
+        currentAtilde = reshape(AtildeTemp,r,r) ;
 
-        [Z_r , D] = eig(Atilde);
+        [Z_r , D] = eig(currentAtilde);
     
-        Phi = X2 * V_r / S_r * Z_r; % DMD modes
-        lambda = diag(D); % discrete -time eigenvalues
-                
-        % Reconstructing DMD
-        Nf=pred;%number of time steps forward 
-        x1=X2(:,end);%Take the last snap shot from X2
-        b=Phi\x1;%Obtain initial condition from last snapshot
-        temporal=zeros(r,Nf+1);
-        for i=1:Nf+1
-            temporal(:,i)=b.*lambda.^(i-1);%Raise by eigenvalue to power of timestep
+        
+
+        %Phi = X2 * V_r / S_r * Z_r; % DMD modes                  %Instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
+
+        lambda = diag(D);           % discrete -time eigenvalues
+
+%         for m = 1:9
+%             tempLam(m) = lambda(m);
+%         end
+%         abs(tempLam)
+        if j == 1
+            temp1 = lambda;
+        elseif j == 2
+            temp2 = lambda;
+            abs(temp1-temp2)
+
+        else
         end
-        improvedXdmd=Phi*temporal;
+        
+
+        if j == 1                           
+
+            x1=X2(:,end);                        %Take the last snap shot from X2
+            b=Phi\x1;                            %Obtain initial condition from last snapshot
+            improvedXdmd(:,1)=Phi*b ;              %j==1 should be just retrieving the final snapshot. The error with DNS should be approx 0. This is a check.
+            improvedXdmd(:,2)=Phi*(b.*lambda) ;      %j==2 uses AtildeVec24(:,shift+1) to predict
+        else
+            x1=improvedXdmd(:,j);                  %Use the approximation at j...
+            b=Phi\x1;                            %together with the approx DMD modes from AtildeVec24(:,shift+j). 
+                                                 %     Note that these are not the true DMD modes because they use old flow snapshots in V_r, S_r, and X2 
+            improvedXdmd(:,j+1)=Phi*(b.*lambda) ;    %Use AtildeVec24(:,shift+j) to predict the next flow snapshot
+        end
      
     end
 
 
 
+    %Now plot the error of impDMD vs DNS
+    error2 = zeros(1,pred+1);
+            
+    for iii = 1:pred+1
+        tempX = improvedXdmd(:,iii) - stateVecs(:,N+iii-1) ;
+        error2(iii) = sum(sum(abs(abs(tempX))));
+%             errorC(iii) = sumabs(imag(tempX));
+    
+    end
+
+    uMax = max(abs(stateVecs(:,N)));
+    
+    error2 = error2/(rows*uMax);     %Normalize it
+    %error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
+               
+    figure;
+    plot(error2)
+%         hold on;
+%         plot(errorC)
+    title('improvedDMD vs DNS')
+%         hold off;
 
 end
 
