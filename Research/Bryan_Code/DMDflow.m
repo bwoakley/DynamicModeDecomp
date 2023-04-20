@@ -13,16 +13,16 @@ end
 kk = 256;                    %Grid is kk by kk
 rows = (kk^2)*2;             %Number of rows in the snapshots
 
-r = 6;                       %Truncate to r singular values
+r = 24;                       %Truncate to r singular values
 
-N = 10;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
+N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
 pred = 10;                   %pred = number of time steps forward to predict.
 if N+pred>500
     disp('Need more data')
 end
 
-no_Windows = 10;            %How many windows of length N to compute
+no_Windows = 1;            %How many windows of length N to compute
 shift = 50;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
@@ -663,16 +663,16 @@ end
 
 
 if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
-    error = zeros(1,pred);
+    error = zeros(1,pred+1);
             
-    for iii = 1:pred
-        tempX = Xdmd(:,iii) - stateVecs(:,N+iii) ;
-        error(iii) = sumabs(real(tempX));
+    for iii = 1:pred+1
+        tempX = Xdmd(:,iii) - stateVecs(:,N+iii-1) ;
+        error(iii) = sum(sum(abs(abs(tempX))));
 %             errorC(iii) = sumabs(imag(tempX));
     
     end
 
-    uMax = max(abs(stateVecs(:,1)));
+    uMax = max(abs(stateVecs(:,N)));
     
     error = error/(rows*uMax);     %Normalize it
     %error = error(2:end);   %The first entry is the last entry of X2, so let's drop it.
@@ -683,6 +683,124 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
 %         plot(errorC)
     title('DMD vs DNS')
 %         hold off;
+
+   % This is hard coded to N=100, r=24
+   if r ~= 24 || N ~= 100
+       disp('Warning: should set N=100, r=24')
+   end
+
+   currentAtilde = Atilde;  %Take the Atilde from the last loop as the currentAtilde.
+
+   AtildeVec24Tran = importdata('AtildeVec24.csv');
+   AtildeVec24 = AtildeVec24Tran';
+
+   %Check that currentAtilde = AtildeVec24(:,shift+1)
+%     AtildeTemp = AtildeVec24(:,shift+1);
+% 
+%     AtildeTemp2 = reshape(AtildeTemp,r,r);
+% 
+%     errorAtilde = currentAtilde - AtildeTemp2;
+%     sum(sum(abs(errorAtilde)))
+
+
+    %Now I need the most recent V_r and X2. We copy the following from DMD.m
+        [W, S, V] = svd(X1, 'econ');
+    
+        adjustV = true;
+        if adjustV
+            sizeX1 = size(X1);
+            for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
+                if V(1,j) < 0
+                    V(:,j) = -1*V(:,j);
+                    W(:,j) = -1*W(:,j);
+                end
+            end
+        else
+            disp('consider adjusting V')
+        end
+            
+        ss=diag(S);
+        ind=find(ss>ss(1)*1e-10);
+    
+        %  Compute DMD (Phi are eigenvectors)
+        max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
+        r = min([r_orig, size(W,2), max_r]);
+        if r < r_orig
+            disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
+        end
+        
+        W_r = W(:, 1:r); % truncate to rank-r
+        S_r = S(1:r, 1:r);
+        V_r = V(:, 1:r);
+    %End of copying from DMD.m
+    
+    for j = 1:pred
+
+
+        [Z_r , D] = eig(Atilde);
+    
+        Phi = X2 * V_r / S_r * Z_r; % DMD modes
+        lambda = diag(D); % discrete -time eigenvalues
+                
+        % Reconstructing DMD
+        Nf=pred;%number of time steps forward 
+        x1=X2(:,end);%Take the last snap shot from X2
+        b=Phi\x1;%Obtain initial condition from last snapshot
+        temporal=zeros(r,Nf+1);
+        for i=1:Nf+1
+            temporal(:,i)=b.*lambda.^(i-1);%Raise by eigenvalue to power of timestep
+        end
+        improvedXdmd=Phi*temporal;
+     
+    end
+
+
+
+
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 toc

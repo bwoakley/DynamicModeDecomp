@@ -81,9 +81,9 @@ lambda = diag(D); % discrete -time eigenvalues
 Nf=pred;%number of time steps forward 
 x1=X2(:,end);%Take the last snap shot from X2
 b=Phi\x1;%Obtain initial condition from last snapshot
-temporal=zeros(r,Nf);
-for i=1:Nf
-    temporal(:,i)=b.*lambda.^i;%Raise by eigenvalue to power of timestep
+temporal=zeros(r,Nf+1);
+for i=1:Nf+1
+    temporal(:,i)=b.*lambda.^(i-1);%Raise by eigenvalue to power of timestep
 end
 Xdmd=Phi*temporal;
 

@@ -39,7 +39,7 @@ for i = 1:no_of_steps
             %data file name
             ss='Tur5';
     
-            ii = i + 1000 + start_index-1;
+            ii = i-1 + 1000 + start_index;
             st=strcat('../Cases/',ss,'/bin0',num2str(ii));
             fid=fopen(st,'rb');
             data=fread(fid,[1 1],'*float');
