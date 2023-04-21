@@ -17,7 +17,7 @@ r = 24;                       %Truncate to r singular values
 
 N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
-pred = 40;                   %pred = number of time steps forward to predict.
+pred = 10;                   %pred = number of time steps forward to predict.
 if N+pred>500
     disp('Need more data')
 end
@@ -254,7 +254,7 @@ for start_index = 1 : no_Windows
     end
 
     plotBs = false; %Plot the b's. Is there an exponential drop in the coeff b?
-    if true %Turn this on to trucate Atilde to the top modes
+    if false %Turn this on to trucate Atilde to the top modes
 
         b;
 
@@ -449,11 +449,62 @@ for start_index = 1 : no_Windows
         prevAtilde = Atilde;
     end
 
-    if false   %Are the evals switching positions?
 
-        %lambda
+    if false   %For fixed window, use the fixed DMD modes and see how the flow snapshots' coeff evolve over that window.
+
+        windowBvec = zeros(r,N);
+
+        for j = 1:N
+
+            x1 = stateVecs(:,j);
+            windowB = Phi\x1;
+            windowBvec(:,j) = windowB; 
+            
+        end
+
+        figure;
+        %oneVec = ones(1,N);
+
+        for j = 1:r
+
+            plot(abs(windowBvec(j,:)),'k')       
+            hold on;
+
+            %expFit = abs(lambda(j))*oneVec;
+            expFit = zeros(1,N);
+            for m = 1:N
+
+                expFit(m) = abs(lambda(j))^(m-1)*abs(windowBvec(j,1)) ;
+
+            end
+            plot(expFit,'--')
+            hold on;
+            %expFit(1)
+
+            sum(abs( abs(windowBvec(j,:)) - expFit))
+
+        end
+        hold off;
+
+        title('Coeff b along the window of length N=100')
+        
+        % windowBvec(1:10,1)
+
+
+
+
+
+
+
+
 
     end
+
+
+
+
+
+
 
 end
 
@@ -670,9 +721,6 @@ end
 
 if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
 
-    
-    
-
 
     error = zeros(1,pred+1);
             
@@ -716,35 +764,35 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
 
     %Instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
         %Now I need the most recent V_r and X2. We copy the following from DMD.m
-    %         [W, S, V] = svd(X1, 'econ');
-    %     
-    %         adjustV = true;
-    %         if adjustV
-    %             sizeX1 = size(X1);
-    %             for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
-    %                 if V(1,j) < 0
-    %                     V(:,j) = -1*V(:,j);
-    %                     W(:,j) = -1*W(:,j);
-    %                 end
-    %             end
-    %         else
-    %             disp('consider adjusting V')
-    %         end
-    %             
-    %         ss=diag(S);
-    %         ind=find(ss>ss(1)*1e-10);
-    %     
-    %         %  Compute DMD (Phi are eigenvectors)
-    %         max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
-    %         r_orig = r;
-    %         r = min([r_orig, size(W,2), max_r]);
-    %         if r < r_orig
-    %             disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
-    %         end
-    %         
-    %         W_r = W(:, 1:r); % truncate to rank-r
-    %         S_r = S(1:r, 1:r);
-    %         V_r = V(:, 1:r);
+        %             [W, S, V] = svd(X1, 'econ');
+        %         
+        %             adjustV = true;
+        %             if adjustV
+        %                 sizeX1 = size(X1);
+        %                 for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
+        %                     if V(1,j) < 0
+        %                         V(:,j) = -1*V(:,j);
+        %                         W(:,j) = -1*W(:,j);
+        %                     end
+        %                 end
+        %             else
+        %                 disp('consider adjusting V')
+        %             end
+        %                 
+        %             ss=diag(S);
+        %             ind=find(ss>ss(1)*1e-10);
+        %         
+        %             %  Compute DMD (Phi are eigenvectors)
+        %             max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
+        %             r_orig = r;
+        %             r = min([r_orig, size(W,2), max_r]);
+        %             if r < r_orig
+        %                 disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
+        %             end
+        %             
+        %             W_r = W(:, 1:r); % truncate to rank-r
+        %             S_r = S(1:r, 1:r);
+        %             V_r = V(:, 1:r);
         %End of copying from DMD.m
 
 
@@ -789,7 +837,7 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
     
         
 
-        % Phi = X2 * V_r / S_r * Z_r; % DMD modes        %Maybe: instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
+        %Phi = X2 * V_r / S_r * Z_r; % DMD modes        %Maybe: instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
 
         lambda = diag(D);           % discrete -time eigenvalues
 
