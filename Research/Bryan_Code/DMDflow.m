@@ -17,7 +17,7 @@ r = 24;                       %Truncate to r singular values
 
 N = 100;                      %How many state snapshots to use (the X1 and X2 will have N-1 columns)
 
-pred = 2;                   %pred = number of time steps forward to predict.
+pred = 40;                   %pred = number of time steps forward to predict.
 if N+pred>500
     disp('Need more data')
 end
@@ -176,7 +176,7 @@ end
 
 
 %Now track top number of evals
-top = 4;                %Number of top eval to track. Usually want top = even
+top = 8;                %Number of top eval to track. Usually want top = even
 topEval = zeros(top, no_Windows);
 truncate = top;         %Number of top modes to keep when truncating Atilde
 
@@ -254,8 +254,10 @@ for start_index = 1 : no_Windows
     end
 
     plotBs = false; %Plot the b's. Is there an exponential drop in the coeff b?
-    if false %Turn this on to trucate Atilde to the top modes
-        
+    if true %Turn this on to trucate Atilde to the top modes
+
+        b;
+
         %Find top modes
         bAbs = abs(b);
    
@@ -334,7 +336,7 @@ for start_index = 1 : no_Windows
 
         %Compare predictions to DNS    
         % Activate block to Plot error. truncDMD vs DNS vs DMD
-        if true
+        if false
             
             error = zeros(1,pred);
             
@@ -447,7 +449,11 @@ for start_index = 1 : no_Windows
         prevAtilde = Atilde;
     end
 
+    if false   %Are the evals switching positions?
 
+        %lambda
+
+    end
 
 end
 
@@ -663,12 +669,17 @@ end
 
 
 if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
+
+    
+    
+
+
     error = zeros(1,pred+1);
             
     for iii = 1:pred+1
         tempX = Xdmd(:,iii) - stateVecs(:,N+iii-1) ;
         error(iii) = sum(sum(abs(abs(tempX))));
-%             errorC(iii) = sumabs(imag(tempX));
+    %             errorC(iii) = sumabs(imag(tempX));
     
     end
 
@@ -679,108 +690,172 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
                
     figure;
     plot(error)
-%         hold on;
-%         plot(errorC)
+    %         hold on;
+    %         plot(errorC)
     title('DMD vs DNS')
-%         hold off;
+    %      hold off;
 
    % This is hard coded to N=100, r=24
    if r ~= 24 || N ~= 100
        disp('Warning: should set N=100, r=24')
    end
 
-%    currentAtilde = Atilde;  %Take the Atilde from the last loop as the currentAtilde.
+    %    currentAtilde = Atilde;  %Take the Atilde from the last loop as the currentAtilde.
 
    AtildeVec24Tran = importdata('AtildeVec24.csv');
    AtildeVec24 = AtildeVec24Tran';
 
-   %Check that currentAtilde = AtildeVec24(:,shift+1)
-%     AtildeTemp = AtildeVec24(:,shift+1);
-% 
-%     AtildeTemp2 = reshape(AtildeTemp,r,r);
-% 
-%     errorAtilde = currentAtilde - AtildeTemp2;
-%     sum(sum(abs(errorAtilde)))
+    %Check that currentAtilde = AtildeVec24(:,shift+1)
+    %     AtildeTemp = AtildeVec24(:,shift+1);
+    % 
+    %     AtildeTemp2 = reshape(AtildeTemp,r,r);
+    % 
+    %     errorAtilde = currentAtilde - AtildeTemp2;
+    %     sum(sum(abs(errorAtilde)))
 
 
-            %Instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
-                %Now I need the most recent V_r and X2. We copy the following from DMD.m
-            %         [W, S, V] = svd(X1, 'econ');
-            %     
-            %         adjustV = true;
-            %         if adjustV
-            %             sizeX1 = size(X1);
-            %             for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
-            %                 if V(1,j) < 0
-            %                     V(:,j) = -1*V(:,j);
-            %                     W(:,j) = -1*W(:,j);
-            %                 end
-            %             end
-            %         else
-            %             disp('consider adjusting V')
-            %         end
-            %             
-            %         ss=diag(S);
-            %         ind=find(ss>ss(1)*1e-10);
-            %     
-            %         %  Compute DMD (Phi are eigenvectors)
-            %         max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
-            %         r_orig = r;
-            %         r = min([r_orig, size(W,2), max_r]);
-            %         if r < r_orig
-            %             disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
-            %         end
-            %         
-            %         W_r = W(:, 1:r); % truncate to rank-r
-            %         S_r = S(1:r, 1:r);
-            %         V_r = V(:, 1:r);
-                %End of copying from DMD.m
+    %Instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
+        %Now I need the most recent V_r and X2. We copy the following from DMD.m
+    %         [W, S, V] = svd(X1, 'econ');
+    %     
+    %         adjustV = true;
+    %         if adjustV
+    %             sizeX1 = size(X1);
+    %             for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M. This should stop the sign switching of Atilde
+    %                 if V(1,j) < 0
+    %                     V(:,j) = -1*V(:,j);
+    %                     W(:,j) = -1*W(:,j);
+    %                 end
+    %             end
+    %         else
+    %             disp('consider adjusting V')
+    %         end
+    %             
+    %         ss=diag(S);
+    %         ind=find(ss>ss(1)*1e-10);
+    %     
+    %         %  Compute DMD (Phi are eigenvectors)
+    %         max_r = length(ind);  % truncate at r modes, which is singular value >1e-10 max
+    %         r_orig = r;
+    %         r = min([r_orig, size(W,2), max_r]);
+    %         if r < r_orig
+    %             disp(['Singular value(s) < ss(1)*1e-10 detected, truncating from r=', num2str(r_orig), ' to r=', num2str(r)])
+    %         end
+    %         
+    %         W_r = W(:, 1:r); % truncate to rank-r
+    %         S_r = S(1:r, 1:r);
+    %         V_r = V(:, 1:r);
+        %End of copying from DMD.m
 
+
+
+
+
+
+
+
+
+
+    origLambda = lambda;
+    origAtilde = Atilde;
+
+   
+
+
+    checkXdmd = zeros(rows,pred+1);
     improvedXdmd = zeros(rows,pred+1);
     %Now compute DMD with future Atilde, but fixed V_r, S_r, and X2
     for j = 1:pred
 
+        j;
+
         AtildeTemp = AtildeVec24(:,shift+j);
         currentAtilde = reshape(AtildeTemp,r,r) ;
+
+
+        if true
+            alpha = 1;  % Using the future Atilde seems to be an overcorrection, and performs worse than DMD. So, instead use a weighted average...? 
+                % Let alpha be the weight coeff. 
+                % alpha = 1 uses only future Atilde, 
+                % alpha = 0 uses only origAtilde
+
+            currentAtilde = alpha*currentAtilde + (1-alpha)*origAtilde;
+
+        end
+        
+
 
         [Z_r , D] = eig(currentAtilde);
     
         
 
-        %Phi = X2 * V_r / S_r * Z_r; % DMD modes                  %Instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
+        % Phi = X2 * V_r / S_r * Z_r; % DMD modes        %Maybe: instead of recomputing Phi, just use the old DMD modes Phi, but only update lambda
 
         lambda = diag(D);           % discrete -time eigenvalues
 
-%         for m = 1:9
-%             tempLam(m) = lambda(m);
-%         end
-%         abs(tempLam)
+        %         for m = 1:9
+        %             tempLam(m) = lambda(m);
+        %         end
+        %         abs(tempLam)
+        
+        
         if j == 1
             temp1 = lambda;
-        elseif j == 2
-            temp2 = lambda;
-            abs(temp1-temp2)
-
         else
+            temp2 = lambda;
+            max(abs(temp1-temp2));
+
+            diffLam = sum(sum(abs(temp1-temp2)));
+            avgDiffLam = diffLam/(r^2);
+            avgDiffLam;
+            
+            temp1 = lambda;
         end
-        
+        %j
+        %lambda
+
+
 
         if j == 1                           
 
+
             x1=X2(:,end);                        %Take the last snap shot from X2
-            b=Phi\x1;                            %Obtain initial condition from last snapshot
+            b=Phi\x1;                          %Obtain initial condition from last snapshot
             improvedXdmd(:,1)=Phi*b ;              %j==1 should be just retrieving the final snapshot. The error with DNS should be approx 0. This is a check.
             improvedXdmd(:,2)=Phi*(b.*lambda) ;      %j==2 uses AtildeVec24(:,shift+1) to predict
+            
+            checkXdmd(:,1)=Phi*b ; 
+            checkXdmd(:,2)=Phi*(b.*origLambda) ;
+
+            prevB = b.*lambda;
+            checkPrevB = b.*origLambda;
         else
-            x1=improvedXdmd(:,j);                  %Use the approximation at j...
-            b=Phi\x1;                            %together with the approx DMD modes from AtildeVec24(:,shift+j). 
+            %x1=improvedXdmd(:,j);                  %Use the approximation at j...
+            %b=Phi\x1;                            %together with the approx DMD modes from AtildeVec24(:,shift+j). 
                                                  %     Note that these are not the true DMD modes because they use old flow snapshots in V_r, S_r, and X2 
-            improvedXdmd(:,j+1)=Phi*(b.*lambda) ;    %Use AtildeVec24(:,shift+j) to predict the next flow snapshot
+            %improvedXdmd(:,j+1)=Phi*(b.*lambda) ;    %Use AtildeVec24(:,shift+j) to predict the next flow snapshot
+            
+
+
+            %Just evolve the prev coeff using the new lambda
+            improvedXdmd(:,j+1)=Phi*(prevB.*lambda) ;    %Use AtildeVec24(:,shift+j) to predict the next flow snapshot
+            
+            checkXdmd(:,j+1)=Phi*(checkPrevB.*origLambda) ;   
+
+            prevB=prevB.*lambda;
+            checkPrevB = checkPrevB.*origLambda;
+
         end
-     
+        
+        
+
+        diffB = sum(sum(abs(prevB-checkPrevB)));
+        percentDiffB = max( abs(prevB-checkPrevB)./abs(prevB)  );
+
+        
     end
 
-
+    %sum(sum(abs(Xdmd-checkXdmd)))
 
     %Now plot the error of impDMD vs DNS
     error2 = zeros(1,pred+1);
@@ -788,7 +863,7 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
     for iii = 1:pred+1
         tempX = improvedXdmd(:,iii) - stateVecs(:,N+iii-1) ;
         error2(iii) = sum(sum(abs(abs(tempX))));
-%             errorC(iii) = sumabs(imag(tempX));
+        %             errorC(iii) = sumabs(imag(tempX));
     
     end
 
@@ -799,10 +874,11 @@ if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
                
     figure;
     plot(error2)
-%         hold on;
-%         plot(errorC)
+    %         hold on;
+    %         plot(errorC)
     title('improvedDMD vs DNS')
-%         hold off;
+    %         hold off;
+
 
 end
 
