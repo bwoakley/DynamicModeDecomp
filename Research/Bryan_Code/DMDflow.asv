@@ -22,7 +22,7 @@ if N+pred>500
 end
 
 no_Windows = 1;            %How many windows of length N to compute
-shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
+shift = 50;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
 flowCase = 4;   %flowCase decides what flow to use. 
@@ -31,11 +31,9 @@ flowCase = 4;   %flowCase decides what flow to use.
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
                 % flowCase = 4 means sin(r) e^(-kr) transported down the x-axis 
 
-if flowCase == 4        % predicting a scalar
-    rows = kk^2;        %Number of rows in the snapshots
-else                    % predicting a flow
-    rows = (kk^2)*2;    %Number of rows in the snapshots
-end
+
+rows = (kk^2)*2;             %Number of rows in the snapshots
+
 
 % Activate block to plot error for various r
 if false
