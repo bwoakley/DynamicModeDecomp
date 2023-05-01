@@ -25,7 +25,7 @@ no_Windows = 1;            %How many windows of length N to compute
 shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
-flowCase = 4;   %flowCase decides what flow to use. 
+flowCase = 1;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
                 % flowCase = 2 means Linear flow (-x,y)
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
@@ -455,7 +455,7 @@ if true    %Iterate DMD over multiple windows.
         end
     
     
-        if false   %For fixed window, use the fixed DMD modes and see how the flow snapshots' coeff evolve over that window.
+        if true   %For fixed window, use the fixed DMD modes and see how the flow snapshots' coeff evolve over that window.
     
             windowBvec = zeros(r,N);
     
@@ -472,7 +472,7 @@ if true    %Iterate DMD over multiple windows.
     
             for j = 1:r
     
-                plot(abs(windowBvec(j,:)),'k')       
+                plot(abs(windowBvec(j,:)))       
                 hold on;
     
                 %expFit = abs(lambda(j))*oneVec;
@@ -493,10 +493,32 @@ if true    %Iterate DMD over multiple windows.
     
             title('Coeff b along the window of length N=100')
             
-            % windowBvec(1:10,1)
+             %windowBvec(1:10,1)
     
     
+            figure;     
+            for j = 1:r
     
+                plot(log(abs(windowBvec(j,:))))       
+                hold on;
+    
+                %expFit = abs(lambda(j))*oneVec;
+                expFit = zeros(1,N);
+                for m = 1:N
+    
+                    expFit(m) = abs(lambda(j))^(m-1)*abs(windowBvec(j,1)) ;
+    
+                end
+                plot(log(expFit),'--')
+                hold on;
+                %expFit(1)
+    
+%                 sum(abs( abs(windowBvec(j,:)) - expFit))
+    
+            end
+            hold off;
+    
+            title('Log of coeff b along the window of length N=100')
     
     
     
