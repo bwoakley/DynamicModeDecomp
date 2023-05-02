@@ -25,7 +25,7 @@ no_Windows = 1;            %How many windows of length N to compute
 shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
-flowCase = 1;   %flowCase decides what flow to use. 
+flowCase = 4;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
                 % flowCase = 2 means Linear flow (-x,y)
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
@@ -442,8 +442,7 @@ if true    %Iterate DMD over multiple windows.
             
             
         end
-    
-    
+        
         if MatNorm    %Compare Frob norm of diff: abs vs raw
             if i > 1
                 
@@ -453,8 +452,7 @@ if true    %Iterate DMD over multiple windows.
             end
             prevAtilde = Atilde;
         end
-    
-    
+        
         if true   %For fixed window, use the fixed DMD modes and see how the flow snapshots' coeff evolve over that window.
     
             windowBvec = zeros(r,N);
@@ -486,8 +484,10 @@ if true    %Iterate DMD over multiple windows.
                 hold on;
                 %expFit(1)
     
-                sum(abs( abs(windowBvec(j,:)) - expFit))
-    
+                AvgErrorBs = sum(abs( abs(windowBvec(j,:)) - expFit))/N;
+                %disp
+                message = ['Average error of coeff b is ', num2str(AvgErrorBs),  ' for r = ', num2str(j) ];
+                disp(message)
             end
             hold off;
     
@@ -499,7 +499,7 @@ if true    %Iterate DMD over multiple windows.
             figure;     
             for j = 1:r
     
-                plot(log(abs(windowBvec(j,:))))       
+                plot(log10(abs(windowBvec(j,:))))       
                 hold on;
     
                 %expFit = abs(lambda(j))*oneVec;
@@ -509,25 +509,120 @@ if true    %Iterate DMD over multiple windows.
                     expFit(m) = abs(lambda(j))^(m-1)*abs(windowBvec(j,1)) ;
     
                 end
-                plot(log(expFit),'--')
+                plot(log10(expFit),'--')
                 hold on;
                 %expFit(1)
     
 %                 sum(abs( abs(windowBvec(j,:)) - expFit))
     
             end
+%              ylim([-15 6])
+
             hold off;
     
             title('Log of coeff b along the window of length N=100')
     
     
     
-    
-    
-    
         end
     
+
+
+        if true         % If we know the future coefficients b, how well can we use the dynamic modes to approximate DNS?
+
+            windowBvec = zeros(r,N+pred);
+            
+            projErrorVec = zeros(1,N+pred);
+
+            for j = 1:N+pred
     
+                x1 = stateVecs(:,j);
+                windowB = Phi\x1;
+                windowBvec(:,j) = windowB; 
+                
+                projErrorVec(j) = sum(abs(  Phi*windowB - x1  ));
+            end
+    
+            %Take average error over spatial domain
+            uMax = max(abs(stateVecs(:,N)));
+            normalizeConst = rows*uMax ;
+
+            projErrorVec = projErrorVec/normalizeConst; %Normalize the error   
+
+
+            %Plot error and log of error
+            figure;
+            plot(projErrorVec)
+            title('Error of the projection onto dynamic modes')
+
+            figure;
+            plot(log10(projErrorVec),'-o','MarkerSize',4)
+            title('Log of the error of the projection onto dynamic modes')
+
+
+
+
+            %Now compare to DMD
+            error = zeros(1,pred+1);
+                    
+            for iii = 1:pred+1
+                tempX = Xdmd(:,iii) - stateVecs(:,N+iii-1) ;
+                error(iii) = sum(sum(abs(abs(tempX))));
+            %             errorC(iii) = sumabs(imag(tempX));
+            
+            end
+        
+           
+            error = error/normalizeConst;     %Normalize the error
+
+            % Plot error
+            figure;
+
+            plot(error)
+            hold on;
+
+            endProjErrorVec = projErrorVec(N:end);
+            plot(endProjErrorVec)
+
+            title('Error of DMD and exactB DMD ')
+            legend('DMD', 'exactB DMD')
+
+            hold off;
+
+            % Plot log of error
+            figure;
+
+            plot(log10(error))
+            hold on;
+
+            plot(log10(endProjErrorVec))
+
+            title('Log of error of DMD and exactB DMD ')
+            legend('DMD', 'exactB DMD')
+
+            hold off;
+
+
+
+            % How much of an improvement is exactB DMD over DMD? Plot the difference:
+            figure;
+            plot( abs(error - endProjErrorVec) )
+            title('DMD error minus exactB DMD error')
+
+            figure;
+            plot( log10(abs(error - endProjErrorVec) ) )
+            title('Log of DMD error minus exactB DMD error')
+
+            figure;
+            plot( error./endProjErrorVec )
+            title('Ratio of DMD to exactB DMD')
+
+        end
+
+
+
+
+
     end
 end
 
@@ -1149,33 +1244,6 @@ if false    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
     end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
