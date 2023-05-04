@@ -4,12 +4,6 @@ clc;
 format long;
 tic
 
-make_movie = false;         %Set to true to plot movie of evals
-if make_movie                   
-    v = VideoWriter('temp.avi');
-    open(v)
-end
-
 kk = 256;                    %Grid is kk by kk
 
 r = 24;                       %Truncate to r singular values
@@ -32,10 +26,33 @@ flowCase = 4;   %flowCase decides what flow to use.
                 % flowCase = 4 means sin(r) e^(-kr) transported down the x-axis 
 
 if flowCase == 4        % predicting a scalar
+    isScalar = true;
     rows = kk^2;        %Number of rows in the snapshots
 else                    % predicting a flow
+    isScalar = false;
     rows = (kk^2)*2;    %Number of rows in the snapshots
 end
+
+
+
+make_movie = false;         %Set to true to plot movie of evals
+if make_movie                   
+    v = VideoWriter('temp.avi');
+    open(v)
+end
+
+
+
+make_movie_prediction = true;         %Set to true to plot movie of predictions from DMD vs DNS
+if make_movie_prediction                   
+    v = VideoWriter('temp.avi');
+    open(v)
+
+    if isScalar == false
+        disp('Warning: make_movie_prediction is only coded for scalar fields right now')
+    end
+end
+
 
 % Activate block to plot error for various r
 if false
@@ -198,6 +215,24 @@ if true    %Iterate DMD over multiple windows.
     
         [X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index+shift );
         
+
+         if false % Centering data by subtracting mean
+            
+            if i == 1
+                disp('*Centering data by subtracting mean*')
+                
+            end
+
+            oneVec = ones(N-1, 1);
+
+            mu1 = X1*oneVec/(N-1);
+            X1 = X1 - mu1*oneVec' ;
+
+            mu2 = X2*oneVec/(N-1);
+            X2 = X2 - mu2*oneVec' ;
+        end
+
+
         [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r);
         
         AtildeVec(:,i) = reshape(Atilde,[],1);
@@ -453,7 +488,7 @@ if true    %Iterate DMD over multiple windows.
             prevAtilde = Atilde;
         end
         
-        if true   %For fixed window, use the fixed DMD modes and see how the flow snapshots' coeff evolve over that window.
+        if false   %For fixed window, use the fixed DMD modes and see how the flow snapshots' coeff evolve over that window.
     
             windowBvec = zeros(r,N);
     
@@ -540,7 +575,31 @@ if true    %Iterate DMD over multiple windows.
                 windowB = Phi\x1;
                 windowBvec(:,j) = windowB; 
                 
-                projErrorVec(j) = sum(abs(  Phi*windowB - x1  ));
+                exactB_Xdmd = Phi*windowB;
+
+                projErrorVec(j) = sum(abs( exactB_Xdmd  - x1  ));
+            
+                %complexError = sum(abs(imag(exactB_Xdmd)))
+
+                if j > N
+                    if make_movie_prediction
+    
+                        figure;
+                        set(gcf,'position',[100 100 800 700])
+                        
+                        theta = reshape(abs(exactB_Xdmd),kk,kk);
+    
+                        pcolor(theta); shading interp; drawnow;
+        
+                        frame = getframe(gcf);
+                        writeVideo(v,frame);
+                        
+                        close all;
+    
+                    end
+                end
+
+
             end
     
             %Take average error over spatial domain
@@ -550,15 +609,17 @@ if true    %Iterate DMD over multiple windows.
             projErrorVec = projErrorVec/normalizeConst; %Normalize the error   
 
 
-            %Plot error and log of error
-            figure;
-            plot(projErrorVec)
-            title('Error of the projection onto dynamic modes')
+            if false      %Plot error and log of error
 
-            figure;
-            plot(log10(projErrorVec),'-o','MarkerSize',4)
-            title('Log of the error of the projection onto dynamic modes')
+                figure;
+                plot(projErrorVec)
+                title('Error of the projection onto dynamic modes')
+    
+                figure;
+                plot(log10(projErrorVec),'-o','MarkerSize',4)
+                title('Log of the error of the projection onto dynamic modes')
 
+            end
 
 
 
@@ -575,52 +636,57 @@ if true    %Iterate DMD over multiple windows.
            
             error = error/normalizeConst;     %Normalize the error
 
-            % Plot error
-            figure;
+            if false     % Plot error
+                figure;
+    
+                plot(error)
+                hold on;
+    
+                endProjErrorVec = projErrorVec(N:end);
+                plot(endProjErrorVec)
+    
+                title('Error of DMD and exactB DMD ')
+                legend('DMD', 'exactB DMD')
+    
+                hold off;
+    
+                % Plot log of error
+                figure;
+    
+                plot(log10(error))
+                hold on;
+    
+                plot(log10(endProjErrorVec))
+    
+                title('Log of error of DMD and exactB DMD ')
+                legend('DMD', 'exactB DMD')
+    
+                hold off;
 
-            plot(error)
-            hold on;
-
-            endProjErrorVec = projErrorVec(N:end);
-            plot(endProjErrorVec)
-
-            title('Error of DMD and exactB DMD ')
-            legend('DMD', 'exactB DMD')
-
-            hold off;
-
-            % Plot log of error
-            figure;
-
-            plot(log10(error))
-            hold on;
-
-            plot(log10(endProjErrorVec))
-
-            title('Log of error of DMD and exactB DMD ')
-            legend('DMD', 'exactB DMD')
-
-            hold off;
+            end
 
 
+            if false    % How much of an improvement is exactB DMD over DMD? Plot the difference:
+                
+                figure;
+                plot( abs(error - endProjErrorVec) )
+                title('DMD error minus exactB DMD error')
+    
+                figure;
+                plot( log10(abs(error - endProjErrorVec) ) )
+                title('Log of DMD error minus exactB DMD error')
+    
+                figure;
+                plot( error./endProjErrorVec )
+                title('Ratio of DMD to exactB DMD')
 
-            % How much of an improvement is exactB DMD over DMD? Plot the difference:
-            figure;
-            plot( abs(error - endProjErrorVec) )
-            title('DMD error minus exactB DMD error')
+            end
 
-            figure;
-            plot( log10(abs(error - endProjErrorVec) ) )
-            title('Log of DMD error minus exactB DMD error')
 
-            figure;
-            plot( error./endProjErrorVec )
-            title('Ratio of DMD to exactB DMD')
+            
+
 
         end
-
-
-
 
 
     end
@@ -874,7 +940,7 @@ if false    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
     % Now compute DMD with alternative algorithms:
     % 'current' refers to using future/preditions of Atilde, with old modes Phi,
     %       giving 'improvedDMD'. However, this does not seem to be an improvement.
-    if true
+    if false
 
     
        % This is hard coded to N=100, r=24
@@ -1062,7 +1128,7 @@ if false    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
     % Let's try an alternative algorithm 'feedback':
     % 'feedback' refers to plugging our predictions of the flow snapshot back into feedbackX1 and feedbackX2,
     %       using that to generate feedbackAtilde and then a new predition.
-    if false
+    if true
         feedbackXdmdPred = zeros(rows,pred+1);
         for j = 1:pred
         
@@ -1109,6 +1175,21 @@ if false    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
         %         plot(errorC)
         title('feedbackDMD vs DNS')
         %         hold off;
+
+
+        figure;
+        plot(error)
+        hold on;
+        plot(error3)
+        title('Error')
+        legend('DMD', 'feedbackDMD')
+        hold off;
+
+        ratioDMDtoFeedback = error./error3;
+        figure;
+        plot(ratioDMDtoFeedback)
+        title('Ratio of DMD to FeedbackDMD error')
+
     end
 
 
@@ -1247,17 +1328,9 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+if make_movie || make_movie_prediction
+    close(v)
+end
 
 
 
