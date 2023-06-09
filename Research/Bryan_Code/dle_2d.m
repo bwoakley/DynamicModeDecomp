@@ -26,9 +26,10 @@ dle=log(lam)/(2*INTTIME);            %Use this for net difference
 % % subplot(3,1,1)
 
 
-% figure;
-% pcolor(dle);shading interp; colorbar; daspect([1 1 1]); 
-% title('FTLE')
+figure;
+pcolor(dle);shading interp; colorbar; daspect([1 1 1]); 
+
+title('FTLE')
 
 % set(gca,'fontsize',24)
 % daspect([1 1 1]); 

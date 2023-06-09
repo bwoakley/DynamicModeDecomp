@@ -123,20 +123,6 @@ for i = 1:no_of_steps
             temp = reshape(u1,[],1);
         end
 
-
-        if false %subtract mean
-            
-            if i == 1
-                disp('*Centering data by subtracting mean*')
-                
-                sum(temp)/rows
-
-            end
-
-            temp = temp - sum(temp)/rows;
-            %sum(temp)
-        end
-
         stateVecs(:,i) = temp;
 
 end

@@ -29,8 +29,8 @@ deltat = dir*timestepsize; %%integration step size with direction
 
 BASESTEP=0.2*Period; %basetime interval
 %INTTIME=2*Period; %integration time. Right now, this goes to time t = 2. Let's reduce it:
-%INTTIME=99*abs(deltat);
-INTTIME=10*abs(deltat);
+INTTIME=99*abs(deltat);
+% INTTIME=10*abs(deltat);
 %INTTIME=.99*Period;
 
 
@@ -181,7 +181,8 @@ for ti=1:N_Basetime
 
 
         %data file name
-        ss='Line';
+        %ss='Line';
+        ss='Turb';
 
         ii = i + 1000;
         st=strcat('../Cases/',ss,'/bin0',num2str(ii));
@@ -192,21 +193,6 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u1 = data(:,:,1)' ;
         v1 = data(:,:,2)' ;
-
-%         if i == 1
-%             u1temp = u1;
-%             v1temp = v1;
-%             
-%         else
-%             u1 = u1temp;
-%             v1 = v1temp;
-%         end
-
-%         u1 = -1*(XST-1.5);
-%         v1 = YST-1.5;
-
-          u1 = 10*(YST-1.5);
-          v1 = 0*XST;
 
 %         figure;
 %         quiver(u1,v1)
@@ -233,18 +219,6 @@ for ti=1:N_Basetime
         data=reshape(data,kk,kk,3);
         u2 = data(:,:,1)' ;
         v2 = data(:,:,2)' ;
-
-%         u2 = -1*(XST-1.5);
-%         v2 = YST-1.5;
-
-
-          u2 = 10*(YST-1.5);
-          v2 = 0*XST;
-
-%         
-%         u2 = u1temp;
-%         v2 = v1temp;
-%         errorFlow =  max( max ( abs(u1temp - u2) + abs(v1temp - v2)));
 
 
         u2Extend = [u2, u2, u2; u2, u2, u2; u2, u2, u2];
@@ -929,7 +903,7 @@ for ti=1:N_Basetime
         frame = getframe(gcf);
         writeVideo(v,frame);
 
-
+        close all;
 
     end
 

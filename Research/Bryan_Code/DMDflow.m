@@ -19,7 +19,7 @@ no_Windows = 1;            %How many windows of length N to compute
 shift = 0;                %Shift starting window. We will look from N = shift to N = shift+no_Windows
 
 
-flowCase = 4;   %flowCase decides what flow to use. 
+flowCase = 1;   %flowCase decides what flow to use. 
                 % flowCase = 1 means 'turb'
                 % flowCase = 2 means Linear flow (-x,y)
                 % flowCase = 3 means Linear flow with time dependent amplitute (1-t/10). 
@@ -43,9 +43,9 @@ end
 
 
 
-make_movie_prediction = true;         %Set to true to plot movie of predictions from DMD vs DNS
+make_movie_prediction = false;         %Set to true to plot movie of predictions from DMD vs DNS
 if make_movie_prediction                   
-    v = VideoWriter('temp.avi');
+    v = VideoWriter('temp2.avi');
     open(v)
 
     if isScalar == false
@@ -214,25 +214,7 @@ if true    %Iterate DMD over multiple windows.
         i = start_index;
     
         [X1, X2, stateVecs] = DMDpullData( pred, N, flowCase, kk, start_index+shift );
-        
-
-         if false % Centering data by subtracting mean
-            
-            if i == 1
-                disp('*Centering data by subtracting mean*')
-                
-            end
-
-            oneVec = ones(N-1, 1);
-
-            mu1 = X1*oneVec/(N-1);
-            X1 = X1 - mu1*oneVec' ;
-
-            mu2 = X2*oneVec/(N-1);
-            X2 = X2 - mu2*oneVec' ;
-        end
-
-
+                 
         [Phi, lambda, b, Xdmd, S, Atilde] = DMD(X1,X2,pred,r);
         
         AtildeVec(:,i) = reshape(Atilde,[],1);
@@ -490,46 +472,99 @@ if true    %Iterate DMD over multiple windows.
         
         if false   %For fixed window, use the fixed DMD modes and see how the flow snapshots' coeff evolve over that window.
     
-            windowBvec = zeros(r,N);
-    
-            for j = 1:N
-    
-                x1 = stateVecs(:,j);
+
+            fontSize = 14; 
+
+
+            M2 = N+pred;
+
+            windowBvec = zeros(r,M2);
+            expFit = zeros(r,M2);
+
+            for m = 1:M2
+
+                x1 = stateVecs(:,m);
                 windowB = Phi\x1;
-                windowBvec(:,j) = windowB; 
-                
-            end
+                windowBvec(:,m) = windowB;                             
     
+            end
+
+
+            for j = 1:r
+                for m = 1:M2
+
+                    expFit(j,m) = abs(lambda(j))^(m-1)*abs(windowBvec(j,1)) ;
+                                      
+%                     expFit(j,m) = abs(lambda(j))^(m-N)*abs(windowBvec(j,N));
+                       
+                end
+            end
+            
+
             figure;
-            %oneVec = ones(1,N);
     
             for j = 1:r
     
                 plot(abs(windowBvec(j,:)))       
                 hold on;
-    
-                %expFit = abs(lambda(j))*oneVec;
-                expFit = zeros(1,N);
-                for m = 1:N
-    
-                    expFit(m) = abs(lambda(j))^(m-1)*abs(windowBvec(j,1)) ;
-    
-                end
-                plot(expFit,'--')
+                    
+                plot(expFit(j,:),'--')
                 hold on;
-                %expFit(1)
+                %expFit
     
-                AvgErrorBs = sum(abs( abs(windowBvec(j,:)) - expFit))/N;
+                AvgErrorBs = sum(abs( abs(windowBvec(j,:)) - expFit(j,:) ))/M2;
                 %disp
                 message = ['Average error of coeff b is ', num2str(AvgErrorBs),  ' for r = ', num2str(j) ];
                 disp(message)
             end
             hold off;
     
-            title('Coeff b along the window of length N=100')
-            
-             %windowBvec(1:10,1)
+            legend('$b_n$', '$a_N \lambda^n$', 'FontSize', fontSize,'Interpreter', 'latex' )
+            title('Coefficients $b_n$ and the exponential fit', 'FontSize', fontSize,'Interpreter', 'latex')
+
+
+
+
+%             figure;
+%     
+%             for j = 1:r
+%     
+%                 plot(abs(windowBvec(j,1:N)))       
+%                 hold on;
+%     
+%                 plot(expFit(j,1:N),'--')
+%                 hold on;
+%                 %expFit
+%     
+%                 
+%             end
+%             hold off;
+%     
+%             
+%             legend('$b_n$', '$a_N \lambda^n$', 'FontSize', fontSize,'Interpreter', 'latex' )
+%             title(['Coefficients $b_n$ and the exponential fit along the window of length N=', num2str(N)], 'FontSize', fontSize,'Interpreter', 'latex')
+
+            figure;
     
+            for j = 1:r
+    
+                plot(abs( windowBvec(j, N:N+pred) ))       
+                hold on;
+    
+                
+                plot(expFit(j,N:N+pred),'--')
+                hold on;
+                %expFit
+    
+                
+            end
+            hold off;
+               
+            legend('$b_n$', '$a_N \lambda^n$', 'FontSize', fontSize,'Interpreter', 'latex' )
+            title('Coefficients $b_n$ and the predicted coefficients from the exponential fit', 'FontSize', fontSize,'Interpreter', 'latex')
+
+
+
     
             figure;     
             for j = 1:r
@@ -537,33 +572,65 @@ if true    %Iterate DMD over multiple windows.
                 plot(log10(abs(windowBvec(j,:))))       
                 hold on;
     
-                %expFit = abs(lambda(j))*oneVec;
-                expFit = zeros(1,N);
-                for m = 1:N
-    
-                    expFit(m) = abs(lambda(j))^(m-1)*abs(windowBvec(j,1)) ;
-    
-                end
-                plot(log10(expFit),'--')
+                
+                plot(log10(expFit(j,:) ),'--')
                 hold on;
-                %expFit(1)
-    
-%                 sum(abs( abs(windowBvec(j,:)) - expFit))
+                
     
             end
-%              ylim([-15 6])
 
             hold off;
     
-            title('Log of coeff b along the window of length N=100')
     
+            legend('$\log_{10}(b_n)$', '$\log_{10}(a_N \lambda^n)$', 'FontSize', fontSize,'Interpreter', 'latex' )
+            title('Log of the coefficients $b_n$ and the exponential fit', 'FontSize', fontSize,'Interpreter', 'latex')
+
+
+
+
+
+            figure;     
+            for j = 1:r
     
+                plot(log10(abs(windowBvec(j,N:N+pred))))       
+                hold on;
+    
+                
+                plot(log10(expFit(j, N:N+pred) ),'--')
+                hold on;
+               
+    
+            end
+
+            hold off;
+    
+            legend('$\log_{10}(b_n)$', '$\log_{10}(a_N \lambda^n)$', 'FontSize', fontSize,'Interpreter', 'latex' )
+            title('Log of the coefficients $b_n$ and the predicted coefficients from the exponential fit', 'FontSize', fontSize,'Interpreter', 'latex')
+
+
+
+            figure;     
+            for j = 1:r
+    
+                temp1 = abs(windowBvec(j,:)) ;    
+                temp2 = expFit(j,:) ;
+                
+                
+                plot( abs(temp1 - temp2) )
+                hold on;
+                    
+            end
+            hold off;
+
+            legend('$| a_N \lambda^n - b_n |$', 'FontSize', fontSize ,'Interpreter', 'latex')
+            title('Difference of $b_n$ and the exponential fit', 'FontSize', fontSize,'Interpreter', 'latex')
+
     
         end
     
 
 
-        if true         % If we know the future coefficients b, how well can we use the dynamic modes to approximate DNS?
+        if false         % If we know the future coefficients b, how well can we use the dynamic modes to approximate DNS?
 
             windowBvec = zeros(r,N+pred);
             
@@ -578,25 +645,24 @@ if true    %Iterate DMD over multiple windows.
                 exactB_Xdmd = Phi*windowB;
 
                 projErrorVec(j) = sum(abs( exactB_Xdmd  - x1  ));
+%                 projErrorVec(j) = sum(abs( (exactB_Xdmd  - x1)./x1  ));
             
                 %complexError = sum(abs(imag(exactB_Xdmd)))
 
-                if j > N
-                    if make_movie_prediction
+                if make_movie_prediction
+
+                    figure;
+                    set(gcf,'position',[100 100 800 700])
+                    
+                    theta = reshape(abs(exactB_Xdmd),kk,kk);
+
+                    pcolor(theta); shading interp; drawnow;
     
-                        figure;
-                        set(gcf,'position',[100 100 800 700])
-                        
-                        theta = reshape(abs(exactB_Xdmd),kk,kk);
-    
-                        pcolor(theta); shading interp; drawnow;
-        
-                        frame = getframe(gcf);
-                        writeVideo(v,frame);
-                        
-                        close all;
-    
-                    end
+                    frame = getframe(gcf);
+                    writeVideo(v,frame);
+                    
+                    close all;
+
                 end
 
 
@@ -605,11 +671,12 @@ if true    %Iterate DMD over multiple windows.
             %Take average error over spatial domain
             uMax = max(abs(stateVecs(:,N)));
             normalizeConst = rows*uMax ;
+%             normalizeConst = rows ;
 
             projErrorVec = projErrorVec/normalizeConst; %Normalize the error   
 
 
-            if false      %Plot error and log of error
+            if true      %Plot error and log of error
 
                 figure;
                 plot(projErrorVec)
@@ -628,6 +695,7 @@ if true    %Iterate DMD over multiple windows.
                     
             for iii = 1:pred+1
                 tempX = Xdmd(:,iii) - stateVecs(:,N+iii-1) ;
+%                 tempX = (Xdmd(:,iii) - stateVecs(:,N+iii-1))./stateVecs(:,N+iii-1) ;
                 error(iii) = sum(sum(abs(abs(tempX))));
             %             errorC(iii) = sumabs(imag(tempX));
             
@@ -636,7 +704,7 @@ if true    %Iterate DMD over multiple windows.
            
             error = error/normalizeConst;     %Normalize the error
 
-            if false     % Plot error
+            if true     % Plot error
                 figure;
     
                 plot(error)
@@ -666,7 +734,7 @@ if true    %Iterate DMD over multiple windows.
             end
 
 
-            if false    % How much of an improvement is exactB DMD over DMD? Plot the difference:
+            if true    % How much of an improvement is exactB DMD over DMD? Plot the difference:
                 
                 figure;
                 plot( abs(error - endProjErrorVec) )
@@ -850,7 +918,7 @@ if plotBs
 
 end
 
-%Plot MatNorm of diff
+%Plot Matrix Norm of the difference
 if MatNorm
     figure;
     plot(errs)
@@ -896,7 +964,7 @@ if false  %Save the Atilde to a csv file
     writematrix(AtildeVecTran)
 end
 
-if false    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
+if true    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
 
 
 
@@ -940,7 +1008,7 @@ if false    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
     % Now compute DMD with alternative algorithms:
     % 'current' refers to using future/preditions of Atilde, with old modes Phi,
     %       giving 'improvedDMD'. However, this does not seem to be an improvement.
-    if false
+    if true
 
     
        % This is hard coded to N=100, r=24
@@ -1120,6 +1188,19 @@ if false    %Plot the error of DMD vs DNS vs futureAtilde+oldFlow
         %         plot(errorC)
         title('improvedDMD vs DNS')
         %         hold off;
+
+        
+        figure;
+        plot(log10(error))
+        hold on;
+        plot(log10(error2))
+        hold off;
+        legend('DMD', 'exactAtilde DMD' )
+        title('Log of error of DMD and exactAtilde DMD against DNS')
+
+
+
+
     end
 
 
