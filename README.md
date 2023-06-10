@@ -1,52 +1,35 @@
-# DynamicModeDecomposition
+# Dynamic Mode Decomposition
 
-9.13.0.2105380 (R2022b)
+## Introduction
+The following is a research project that I worked on as a Postdoctoral Scholar at the School of Mathematical and Statistical Sciences at Arizona State University. As a researcher in the field of fluid dynamics, I pursued a data driven point of view, using modern machine learning algorithms on the time series data of fluid flow states.
 
-## Getting started
+Fluid dynamics is an important field of study for many industries including: Aerospace, Energy (wind, hydroelectric, fossil fuels / oil), Automotive, Environmental, Pharmaceutical, Chemical and Petrochemical, Food and Beverage, etc. In general, this is implemented as a complex time series of data, where one must rely on mathematical theorems and algorithms to lead explainability and predictability of the phenomenon recognized in computational simulation models. 
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Description
+The [Dynamic Mode Decomposition (DMD) algorithm](https://en.wikipedia.org/wiki/Dynamic_mode_decomposition) is a dimensionality reduction algorithm appearing in Schmid 2010 (see [References](#references)). Given simple dynamics (linear flows), it is known that one can use the DMD algorithm to estimate the future fluid velocity data. In this project, we extend this method to apply to weakly nonlinear flows. This project has applications to turbulent flow predictions such as weather forecasts. 
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
-## Add your files
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/boakley/mixingandlyapexp.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.com/boakley/mixingandlyapexp/-/settings/integrations)
+## Files
+All code is written in Matlab (version R2022b: 9.13.0.2105380).
 
-## Collaborate with your team
+- [ ] DMDreport.pdf : A file detailing the project and results.
+- [ ] MatlabCode\DMDflow.m : The main Matlab file which generates all images, videos, and results. Change various Boolean values from False to True to explore different sections of the code and produce some nice pictures.
+- [ ]  MatlabCode\DMD.m : Helper function implementing DMD. Mostly borrowed from Kutz et. al. 2016 (see [References](#references)).
+- [ ] MatlabCode\DMDflow.m :  Helper function reading the fluid flow data from the Cases folder.
+- [ ] Cases : This folder contains the raw fluid flow data as binary files (bin01XXX). The data was generated in Fortran using a fourth order Runge–Kutta method. The Fortran file can be found at: [Diablo.f](https://www.damtp.cam.ac.uk/user/jrt51/files.html).
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+## References
+- [ ] Schmid, P. (2010). Dynamic mode decomposition of numerical and experimental data. _Journal of Fluid Mechanics,_  _656_, 5-28. doi:[10.1017/S0022112010001217](https://doi.org/10.1017/S0022112010001217)
+- [ ] Kutz, N. , Brunton, S. , Brunton, B. , and Proctor, J. (2016). Dynamic Mode Decomposition. _Society for Industrial and Applied Mathematics,_ Philadelphia, PA. doi:[10.1137/1.9781611974508](https://epubs.siam.org/doi/abs/10.1137/1.9781611974508)
 
-## Test and Deploy
 
-Use the built-in continuous integration in GitLab.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
 
-***
 
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
 
 ## Suggestions for a good README
 Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
