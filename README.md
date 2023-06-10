@@ -1,6 +1,6 @@
-# MixingAndLyapExp
+# DynamicModeDecomposition
 
-
+9.13.0.2105380 (R2022b)
 
 ## Getting started
 
