@@ -33,22 +33,28 @@ We now illustrate some of the methodology used in this research project.
 
 ## Data Cleaning
 
-When learning the coefficients of the matrix $\widetilde{A}_i$ , we found that there was significant noise. To demonstrate that the entries of $\widetilde{A}_i$ evolved in a noisy way, we may consider the [Frobenius Norm](https://en.wikipedia.org/wiki/Matrix_norm) of differences: $$|| \widetilde{A}_{i+1}-\widetilde{A}_{i}||_F$$
-We plot the evolution of this norm:
+When learning the coefficients of the matrix $\widetilde{A}_i$ , we found that there was significant noise. To demonstrate, we plot the entries of $\widetilde{A}_i$ on top of each other:
+
+![image](MatlabCode/AtildeRaw.jpg)
+
+As can be seen in the above plots, the evolution of the entries of $\widetilde{A}_i$ is quite noisy. Any model of this stochastic evolution would have a large variance. We may clean the data by altering one of the steps of the DMD algorithm to force the Singular Value Decomposition of $X_1$ to take its singular vectors from a codimension 1 manifold (the right half of the 'plane'), so that the SVD is more unique. The relevant code, found in __MatlabCode\DMD.m__, is:
+
+	[W, S, V] = svd(X1, 'econ');
+	sizeX1 = size(X1);
+	for j = 1:sizeX1(2)    %adjusting vectors in V,W so that they are always sampled from the right half of R^M
+		if V(1,j) < 0
+			V(:,j) = -1*V(:,j);
+			W(:,j) = -1*W(:,j);
+   		end
+	end
+    	
+
+This results in a more continuous evolution of the coefficients of $\widetilde{A}_i$. We redraw the above plot after making this change:
+
+![image](MatlabCode/Atilde.jpg)
 
 
-We can also demonstrate the noisy evolution of the entries of $\widetilde{A}_i$ by plotting these coefficients on top of each other:
-
-As can be seen in the above plots, the evolution of the entries of $\widetilde{A}_i$ is quite noisy. Any model of this stochastic evolution would have a large variance. We may clean the data by altering one of the steps of the DMD algorithm to force the Singular Value Decomposition of $X_1$ to take its singular vectors from a codimension 1 submanifold (the right half of the 'plane'), so that the SVD is more unique. The relevant code, found in __DMD.m__, is:
-
-	hi
-
-This results in a more continuous evolutions of the coefficients of $\widetilde{A}_i$. We redraw the above plot after making this change. 
-The evolution of the Frobenius Norm of the difference:
-
-The evolution of the coefficients plotted on top of each other:
-
-We recommend other researchers take this extra step before considering machine learning algorithms on $\widetilde{A}_i$ because the evolution is much smoother in the above two plots, making time series predictions more feasible. And so, we may pursue the proposed algorithm __learnAtilde DMD__. 
+We recommend other researchers take this extra step before considering machine learning algorithms on $\widetilde{A}_i$ because the evolution is smoother, making time series predictions more accurate and the proposed algorithm __learnAtilde DMD__ feasable.
 
 ## References
 - [ ] Schmid, P. (2010). Dynamic mode decomposition of numerical and experimental data. _Journal of Fluid Mechanics,_  _656_, 5-28. doi:[10.1017/S0022112010001217](https://doi.org/10.1017/S0022112010001217)
