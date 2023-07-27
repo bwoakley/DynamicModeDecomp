@@ -25,9 +25,9 @@ All code is written in Matlab (version R2022b: 9.13.0.2105380).
 ## The algorithms
 
 Suppose you have time series data $u_1 , u_2, \dots, u_N$ that evolves according to the linear map $u_{i+1} = A u_i$. If the data vectors $u_i$ are high dimensional, then so is the matrix $A$. 
-If you are only given the time series data and the matrix $A$ is unknown, then approximating $A$ will prove difficult since it is high dimensional and not sparse. Instead of approximating the high dimensional $A$, the DMD algorithm computes a low dimensional projection $\widetilde{A}$ (see the write-up __Report.pdf__ for more details). The DMD algorithm in this form is due to Schmid 2010 (see [References](#references)).
+If you are only given the time series data and the matrix $A$ is unknown, then approximating $A$ will prove difficult since it is high dimensional and not sparse. Instead of approximating the high dimensional $A$, the DMD algorithm computes a low dimensional projection $\widetilde{A}$ (see the write-up __DMDreport.pdf__ for more details). The DMD algorithm in this form is due to Schmid 2010 (see [References](#references)).
 
-The goal of this project is to extend the DMD algorithm to apply to time series data where the linearity hypothesis $u_{i+1} = A u_i$ fails. To this end, we propose several extensions of the DMD algorithm, they are: __learnB DMD__ , __learnAtilde DMD__, and __feedback DMD__. The write-up __Report.pdf__ is an introduction to these new algorithms and a measure of their improvement over the DMD algorithm by means of several detailed examples.
+The goal of this project is to extend the DMD algorithm to apply to time series data where the linearity hypothesis $u_{i+1} = A u_i$ fails. To this end, we propose several extensions of the DMD algorithm, they are: __learnB DMD__ , __learnAtilde DMD__, and __feedback DMD__. The write-up __DMDreport.pdf__ is an introduction to these new algorithms and a measure of their improvement over the DMD algorithm by means of several detailed examples.
 
 We now illustrate some of the methodology used in this research project.
 
